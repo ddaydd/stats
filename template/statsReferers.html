@@ -1,0 +1,18 @@
+<template name="daydStatsReferers">
+  <div id="daydstats">
+    <h1 class="titre"> Referers</h1>
+
+    <ol class="breadcrumb">
+      <li><a href="/daydstats" title="Stats"><i class="fa fa-area-chart fa-fw"></i> Stats</a></li>
+      <li class="active">Referer</li>
+    </ol>
+
+    {{#each referers}}
+      {{#if referer}}
+        <div class="stats-line">
+          {{referer}} : {{count}}
+        </div>
+      {{/if}}
+    {{/each}}
+  </div>
+</template>

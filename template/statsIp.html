@@ -1,0 +1,44 @@
+<template name="daydStatsIp">
+  <div id="daydstats">
+    <h1 class="titre"> Stats IP : {{ip}}</h1>
+
+    <ol class="breadcrumb">
+      <li><a href="/daydstats" title="Stats"><i class="fa fa-area-chart fa-fw"></i> Stats</a></li>
+      <li class="active">Ip</li>
+    </ol>
+
+    {{#with stats}}
+      <div class="pull-right">{{#if isRobot}}<a href="" class="btn btn-xs btn-success js-as-humain">Robot</a>{{else}}<a href="" class="btn btn-xs btn-warning js-as-robot">Define as robot</a>{{/if}} <a href="" class="btn btn-xs btn-danger js-delete">DEL</a></div>
+      <div>
+        <a href="/daydstats/ip/{{ip}}" class="btn btn-xs btn-default">{{ip}}</a>
+        {{username}}
+      </div>
+      <div><b>Last visit : </b> {{#if modifiedAt}}<label class="label label-success">{{modifiedAt}}</label>{{/if}}</div>
+      <div><b>First visit : </b> <label class="label label-primary">{{createdAt}}</label></div>
+
+      {{#with headers}}
+        <h2>Headers</h2>
+
+        <div class="stats-line">
+          <div><b>host :</b> {{host}}</div>
+          <div><b>connection :</b> {{connection}}</div>
+          <div><b>cache-control :</b> {{cacheControl}}</div>
+          <div><b>accept :</b> {{accept}}</div>
+          <div><b>user-agent :</b> {{userAgent}}</div>
+          <div><b>referer :</b> {{referer}}</div>
+          <div><b>accept-language :</b> {{acceptLanguage}}</div>
+        </div>
+      {{/with}}
+
+      <h2>Path</h2>
+
+        {{#each paths}}
+          <div class="stats-line">
+            <div class="pull-right"><label class="label label-success">{{createdAt}}</label></div>
+            <div><a href="{{path}}">{{path}}</a></div>
+          </div>
+        {{/each}}
+
+    {{/with}}
+  </div>
+</template>

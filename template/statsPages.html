@@ -1,0 +1,16 @@
+<template name="daydStatsPages">
+  <div id="daydstats">
+    <h1 class="titre"> Pages</h1>
+
+    <ol class="breadcrumb">
+      <li><a href="/daydstats" title="Stats"><i class="fa fa-area-chart fa-fw"></i> Stats</a></li>
+      <li class="active">Pages</li>
+    </ol>
+
+    {{#each pages}}
+      <div class="stats-line">
+        <a href="{{path}}">{{path}}</a> : {{count}}
+      </div>
+    {{/each}}
+  </div>
+</template>

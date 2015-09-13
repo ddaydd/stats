@@ -1,0 +1,21 @@
+#daydstats .stats-line {
+    margin-bottom: 1px;
+    padding: 2px 0 2px 20px;
+    width: 100%;
+    word-wrap: break-word;
+}
+
+#daydstats .stats-line:hover {
+    background-color: #ccc;
+}
+#daydstats .stats-line .stats-line:hover {
+    background-color: #eee;
+}
+
+#daydstats .breadcrumb > li {
+    display: inline-block;
+}
+
+#daydstats .pull-right {
+    float: right !important;
+}
