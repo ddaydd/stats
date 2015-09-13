@@ -1,13 +1,13 @@
 Package.describe({
   name: 'dayd:stats',
-  version: '0.0.82',
+  version: '0.0.84',
   // Brief, one-line summary of the package.
   summary: "Visitor stat package to log visits on your site automatically",
   // URL to the Git repository containing the source code for this package.
-  git: '',
+  git: 'https://github.com/ddaydd/stats.git',
   // By default, Meteor will default to using README.md for documentation.
   // To avoid submitting documentation, set this field to null.
-  documentation: 'README.md'
+  documentation: 'README.md',
 });
 
 Package.onUse(function(api) {
