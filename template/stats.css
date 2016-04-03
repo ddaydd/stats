@@ -6,10 +6,17 @@
 }
 
 #daydstats .stats-line:hover {
-    background-color: #ccc;
+    background-color: #333;
+    color: white;
 }
+
 #daydstats .stats-line .stats-line:hover {
-    background-color: #eee;
+    background-color: #555;
+
+}
+
+#daydstats .stats-line .stats-line:hover a:hover {
+    color: white;
 }
 
 #daydstats .breadcrumb > li {

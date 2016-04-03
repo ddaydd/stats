@@ -1,6 +1,6 @@
 Package.describe({
   name: 'dayd:stats',
-  version: '0.0.84',
+  version: '0.0.85',
   // Brief, one-line summary of the package.
   summary: "Visitor stat package to log visits on your site automatically",
   // URL to the Git repository containing the source code for this package.
