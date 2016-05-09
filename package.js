@@ -32,4 +32,6 @@ Package.onUse(function(api) {
   api.add_files("template/statsPages.html", "client");
   api.add_files('template/statsPages.js', ['client']);
   api.add_files('template/stats.css', ['client']);
+
+  api.export(['DaydStatsPath'], ['client', 'server']);
 });
