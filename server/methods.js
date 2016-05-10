@@ -49,6 +49,15 @@ Meteor.methods({
       $set: {"isRobot": isRobot}
     });
 
+  },
+
+  statsNotFilteredGroupedPathCount: function() {
+    return DaydStatsPath.aggregate([{
+      $group: {
+        _id: "$path",
+        count: {$sum: 1}
+      }
+    }]);
   }
 
 });
