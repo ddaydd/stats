@@ -71,6 +71,25 @@ Meteor.methods({
         $limit:5
       }
     ]);
+  },
+  statsUserInsert: function(username, userEmail){
+    var ip = this.connection.httpHeaders['x-forwarded-for'] || this.connection.clientAddress;
+    var date = new Date();
+    var stats = {
+      ip: ip,
+      connectionId: this.connection.id,
+      connection: this.connection,
+      headers: this.connection.headers,
+      modifiedAt: date,
+      createdAt: date
+    };
+    if(this.userId)
+      stats.userId = this.userId;
+    if(username)
+      stats.username = username;
+    if(userEmail)
+      stats.userEmail = userEmail;
+    return DaydStatsUsers.insert(stats);
   }
 
 });
