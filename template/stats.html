@@ -1,54 +1,64 @@
 <template name="daydStats">
   <div id="daydstats">
-    <h1 class="titre"> Stats</h1>
+    {{#if isPath}}
+      {{#each statsByPath}}
+        <p>Path: {{this._id}} - Count: {{this.count}}</p>
+      {{/each}}
+    {{/if}}
 
-    <ol class="breadcrumb">
-      <li class="active"><i class="fa fa-area-chart fa-fw"></i> Home</li>
-      <li><a href="/daydstats/pages" title="Pages"><i class="fa fa-area-chart fa-fw"></i> Pages</a></li>
-      <li><a href="/daydstats/referers" title="Referer"><i class="fa fa-area-chart fa-fw"></i> Referer</a></li>
-    </ol>
+    {{#unless isPath}}
+      <h1 class="titre"> Stats</h1>
 
-    <div class="mb10">
-      <div class="text-right">
-        With :
-        <a href="" class="btn btn-xs btn-primary js-path">Path</a>
-        <a href="" class="btn btn-xs btn-primary js-headers">Headers</a>
-        <a href="" class="btn btn-xs btn-primary js-with-robots">Robots</a>
-      </div>
-    </div>
+      <ol class="breadcrumb">
+        <li class="active"><i class="fa fa-area-chart fa-fw"></i> Home</li>
+        <li><a href="/daydstats/pages" title="Pages"><i class="fa fa-area-chart fa-fw"></i> Pages</a></li>
+        <li><a href="/daydstats/referers" title="Referer"><i class="fa fa-area-chart fa-fw"></i> Referer</a></li>
+      </ol>
 
-    {{#each stats}}
-      <div class="stats-line">
-        <div class="pull-right">{{#if modifiedAtcreatedAt}} <label class="label label-success">{{modifiedAt}}</label>{{else}} <label class="label label-primary">{{createdAt}}</label>{{/if}}</div>
-        <div>
-          <a href="/daydstats/ip/{{ip}}" class="btn btn-xs btn-default">{{ip}}</a>
-          {{#if isRobot}}<label class="label label-warning">robot</label>{{/if}}
-          {{username}}
+      <div class="mb10">
+        <div class="text-right">
+          With :
+          <a href="" class="btn btn-xs btn-primary js-path">Path</a>
+          <a href="" class="btn btn-xs btn-primary js-headers">Headers</a>
+          <a href="" class="btn btn-xs btn-primary js-with-robots">Robots</a>
         </div>
-
-        {{#if show 'path'}}
-          {{#each paths}}
-            <div class="stats-line">
-              <div class="pull-right"><label class="label label-default">{{createdAt}}</label></div>
-              <div><a href="{{path}}">{{path}}</a></div>
-            </div>
-          {{/each}}
-        {{/if}}
-
-        {{#if show 'headers'}}
-          {{#with headers}}
-            <div class="stats-line">
-              <div><b>host :</b> {{host}}</div>
-              <div><b>connection :</b> {{connection}}</div>
-              <div><b>cache-control :</b> {{cacheControl}}</div>
-              <div><b>accept :</b> {{accept}}</div>
-              <div><b>user-agent :</b> {{userAgent}}</div>
-              <div><b>referer :</b> {{referer}}</div>
-              <div><b>accept-language :</b> {{acceptLanguage}}</div>
-            </div>
-          {{/with}}
-        {{/if}}
       </div>
-    {{/each}}
+
+      {{#each stats}}
+        <div class="stats-line">
+          <div class="pull-right">{{#if modifiedAtcreatedAt}}
+            <label class="label label-success">{{modifiedAt}}</label>{{else}}
+            <label class="label label-primary">{{createdAt}}</label>{{/if}}</div>
+          <div>
+            <a href="/daydstats/ip/{{ip}}" class="btn btn-xs btn-default">{{ip}}</a>
+            {{#if isRobot}}<label class="label label-warning">robot</label>{{/if}}
+            {{username}}
+          </div>
+
+          {{#if show 'path'}}
+            {{#each paths}}
+              <div class="stats-line">
+                <div class="pull-right"><label class="label label-default">{{createdAt}}</label></div>
+                <div><a href="{{path}}">{{path}}</a></div>
+              </div>
+            {{/each}}
+          {{/if}}
+
+          {{#if show 'headers'}}
+            {{#with headers}}
+              <div class="stats-line">
+                <div><b>host :</b> {{host}}</div>
+                <div><b>connection :</b> {{connection}}</div>
+                <div><b>cache-control :</b> {{cacheControl}}</div>
+                <div><b>accept :</b> {{accept}}</div>
+                <div><b>user-agent :</b> {{userAgent}}</div>
+                <div><b>referer :</b> {{referer}}</div>
+                <div><b>accept-language :</b> {{acceptLanguage}}</div>
+              </div>
+            {{/with}}
+          {{/if}}
+        </div>
+      {{/each}}
+    {{/unless}}
   </div>
 </template>
