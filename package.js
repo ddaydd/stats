@@ -16,7 +16,8 @@ Package.onUse(function(api) {
   api.use([
     'mongo',
     'meteorhacks:aggregate@1.3.0',
-    'gadicohen:headers@0.0.30'
+    'gadicohen:headers@0.0.30',
+    'twbs:bootstrap'
   ]);
 
   api.use("templating", "client");
