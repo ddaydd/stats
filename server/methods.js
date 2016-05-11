@@ -51,13 +51,26 @@ Meteor.methods({
 
   },
 
-  statsNotFilteredGroupedPathCount: function() {
-    return DaydStatsPath.aggregate([{
-      $group: {
-        _id: "$path",
-        count: {$sum: 1}
+  statsNotFilteredGroupedPathCount: function(custPaths) {
+    return DaydStatsPath.aggregate([
+      {
+        $match: {path: {$in: custPaths}}
+      },
+      {
+        $group: {
+          _id: "$path",
+          count: {$sum: 1}
+        }
+      },
+      {
+        $sort: {
+          count: -1
+        }
+      },
+      {
+        $limit:5
       }
-    }]);
+    ]);
   }
 
 });
