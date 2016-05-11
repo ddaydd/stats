@@ -42,10 +42,15 @@ Template.daydStats.helpers({
       if(u && u.username)
         return u.username;
     }
-
-
+  },
+  statsByPath:function(){
+    Meteor.call("statsNotFilteredGroupedPathCount", this.customPath, function(err, result) {
+      if(err)
+        return console.log(err);
+      Session.set('stats_list_by_path', result);
+    });
+    return Session.get('stats_list_by_path');
   }
-
 });
 
 
