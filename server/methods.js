@@ -81,5 +81,17 @@ Meteor.methods({
     return DaydStatsUsers.update({_id: currentStatsUserId}, {
       $set: {"finishedAt": date}
     });
+  },
+  statsUsersCount: function(distinct) {
+    if(distinct) {
+      return DaydStatsUsers.aggregate([{
+        $group: {
+          _id: "$userEmail",
+          count: {$sum: 1}
+        }
+      }, {$sort: {count: -1}}])
+    }else{
+      return DaydStatsUsers.find().count();
+    }
   }
 });
