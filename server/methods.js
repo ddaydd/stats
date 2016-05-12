@@ -63,7 +63,7 @@ Meteor.methods({
       connectionId: this.connection.id,
       connection: this.connection,
       headers: this.connection.headers,
-      modifiedAt: date,
+      startedAt: date,
       createdAt: date
     };
     if(this.userId)
@@ -72,7 +72,14 @@ Meteor.methods({
       stats.username = username;
     if(userEmail)
       stats.userEmail = userEmail;
-    return DaydStatsUsers.insert(stats);
+    var userStarted = DaydStatsUsers.insert(stats);
+    return userStarted;
+  },
+  statsUserUpdate: function(currentStatsUserId) {
+    var date = new Date();
+    console.log(currentStatsUserId);
+    return DaydStatsUsers.update({_id: currentStatsUserId}, {
+      $set: {"finishedAt": date}
+    });
   }
-
 });
