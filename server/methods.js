@@ -7,15 +7,11 @@ Meteor.methods({
 
     if(exist) {
       var userId = null;
-      if(this.userId)
-        userId = this.userId;
-
+      if(this.userId) userId = this.userId;
       DaydStatsPath.insert({path: path, source_id: exist._id, createdAt: date});
-
       DaydStats.update(exist._id, {
         $set: {"userId": userId, modifiedAt: date}
       });
-
       return exist._id;
     }
     else {
@@ -52,27 +48,14 @@ Meteor.methods({
   },
 
   statsNotFilteredGroupedPathCount: function(custPaths) {
-    return DaydStatsPath.aggregate([
-      {
-        $match: {path: {$in: custPaths}}
-      },
-      {
-        $group: {
-          _id: "$path",
-          count: {$sum: 1}
-        }
-      },
-      {
-        $sort: {
-          count: -1
-        }
-      },
-      {
-        $limit:5
+    return DaydStatsPath.aggregate([{$match: {path: {$in: custPaths}}}, {
+      $group: {
+        _id: "$path",
+        count: {$sum: 1}
       }
-    ]);
+    }, {$sort: {count: -1}}, {$limit: 5}]);
   },
-  statsUserInsert: function(username, userEmail){
+  statsUserInsert: function(username, userEmail) {
     var ip = this.connection.httpHeaders['x-forwarded-for'] || this.connection.clientAddress;
     var date = new Date();
     var stats = {
