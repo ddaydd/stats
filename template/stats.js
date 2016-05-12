@@ -89,5 +89,21 @@ Template.daydStatsPath.helpers({
       Session.set('stats_list_by_path', result);
     });
     return Session.get('stats_list_by_path');
+  },
+  statsNumberOfUsersDistinct:function(){
+    Meteor.call("statsUsersCount", this.distinct, function(err, result) {
+      if(err)
+        return console.log(err);
+      Session.set('stats_number_of_users_distinct', result);
+    });
+    return Session.get('stats_number_of_users_distinct');
+  },
+  usersNumbers:function(){
+    Meteor.call('statsUsersCount', function(err, result){
+      if(err)
+        return console.log(err);
+      Session.set('stats_number_of_users', result);
+    });
+    return Session.get('stats_number_of_users');
   }
 });
