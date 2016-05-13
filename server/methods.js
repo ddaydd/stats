@@ -5,8 +5,12 @@ Meteor.methods({
     var exist = DaydStats.findOne({ip: ip});
     var date = new Date();
     var currentStatsUsers = DaydStatsUsers.findOne({userId: this.userId}, {sort: {createdAt: -1}});
-    if(currentStatsUsers && currentStatsUsers._id)
+    if(currentStatsUsers && currentStatsUsers._id) {
       connectionId = currentStatsUsers._id;
+    } else {
+      connectionId = "root";
+    }
+
 
     if(exist && currentStatsUsers) {
       var userId = null;
