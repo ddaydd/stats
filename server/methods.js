@@ -31,7 +31,7 @@ Meteor.methods({
         stats.userId = this.userId;
 
       var lastInsert = DaydStats.insert(stats);
-      DaydStatsPath.insert({path: path, source_id: lastInsert, connection_id:connectionId, createdAt: new Date()});
+      DaydStatsPath.insert({path: path, source_id: lastInsert, connection_id: connectionId, createdAt: new Date()});
       DaydStatsReferer.update({referer: this.connection.headers.referer}, {$inc: {count: +1}}, {upsert: true});
       return lastInsert;
     }
@@ -77,11 +77,11 @@ Meteor.methods({
       stats.userEmail = userEmail;
     //return DaydStatsUsers.insert(stats);
     var isInDb = DaydStatsUsers.findOne({username: username}, {sort: {createdAt: -1}});
-    if(!isInDb){
+    if(!isInDb) {
       return DaydStatsUsers.insert(stats);
-    } else if(isInDb  && !isInDb.finishedAt){
+    } else if(isInDb && !isInDb.finishedAt) {
       return true;
-    }else if(isInDb && isInDb.finishedAt){
+    } else if(isInDb && isInDb.finishedAt) {
       return DaydStatsUsers.insert(stats);
     }
   },
@@ -119,6 +119,16 @@ Meteor.methods({
         avgConnectionDuration: {$avg: "$connectionDuration"}
       }
     }, {$sort: {avgConnectionDuration: -1}}])
+  },
+  getPathsPerUserConnection: function() {
+    return DaydStatsPath.aggregate([{
+      $group: {
+        _id: "$connection_id",
+        pages: {$sum: 1}
+      }
+    },
+      {$sort: {pages: -1}}
+    ])
   }
 });
 
