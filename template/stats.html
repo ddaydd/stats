@@ -89,4 +89,14 @@
       {{/each}}
     </ul>
   {{/if}}
+  {{#if isPathPerConnection}}
+    <ul class="list-group">
+      {{#each pathPerConnection}}
+        <li class="list-group-item badge-inverse">
+          <span class="badge">{{pages}}</span>
+          {{this._id}}
+        </li>
+      {{/each}}
+    </ul>
+  {{/if}}
 </template>
