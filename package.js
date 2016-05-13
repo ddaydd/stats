@@ -17,12 +17,14 @@ Package.onUse(function(api) {
     'mongo',
     'meteorhacks:aggregate@1.3.0',
     'gadicohen:headers@0.0.30',
+    'accounts-base',
     'twbs:bootstrap'
   ]);
 
   api.use("templating", "client");
   api.add_files('lib/collection.js', ['server', 'client']);
   api.add_files('lib/router.js', ['server', 'client']);
+  api.add_files('client/main.js', ['client']);
   api.add_files('server/publish.js', ['server']);
   api.add_files('server/methods.js', ['server']);
   api.add_files("template/stats.html", "client");
