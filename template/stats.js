@@ -82,7 +82,7 @@ Template.daydStats.events({
 
 });
 Template.daydStatsPath.helpers({
-  statsByPath:function(){
+  statsByPath: function() {
     Meteor.call("statsNotFilteredGroupedPathCount", this.customPath, function(err, result) {
       if(err)
         return console.log(err);
@@ -90,7 +90,7 @@ Template.daydStatsPath.helpers({
     });
     return Session.get('stats_list_by_path');
   },
-  statsNumberOfUsersDistinct:function(){
+  statsNumberOfUsersDistinct: function() {
     Meteor.call("statsUsersCount", this.distinct, function(err, result) {
       if(err)
         return console.log(err);
@@ -98,12 +98,32 @@ Template.daydStatsPath.helpers({
     });
     return Session.get('stats_number_of_users_distinct');
   },
-  usersNumbers:function(){
-    Meteor.call('statsUsersCount', function(err, result){
+  usersNumbers: function() {
+    Meteor.call('statsUsersCount', function(err, result) {
       if(err)
         return console.log(err);
       Session.set('stats_number_of_users', result);
     });
     return Session.get('stats_number_of_users');
+  },
+  usersWithConnectionDuration: function() {
+    Meteor.call('getStatsDurationConnectionAverage', function(err, result) {
+      if(err)
+        console.log(err);
+      Session.set('stats_user_with_duration', result);
+    });
+    return Session.get('stats_user_with_duration');
+  },
+  connectionDuration: function(){
+    return formatDuration(this.avgConnectionDuration);
   }
 });
+
+function formatDuration(ms) {
+  var duration = moment.duration(ms);
+  if (duration.asHours() > 1) {
+    return Math.floor(duration.asHours()) + moment.utc(duration.asMilliseconds()).format(":mm:ss");
+  } else {
+    return moment.utc(duration.asMilliseconds()).format("mm:ss");
+  }
+}
