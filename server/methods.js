@@ -4,11 +4,14 @@ Meteor.methods({
     var ip = this.connection.httpHeaders['x-forwarded-for'] || this.connection.clientAddress;
     var exist = DaydStats.findOne({ip: ip});
     var date = new Date();
+    var currentStatsUsers = DaydStatsUsers.findOne({userId: this.userId}, {sort: {createdAt: -1}});
+    if(currentStatsUsers && currentStatsUsers._id)
+      connectionId = currentStatsUsers._id;
 
-    if(exist) {
+    if(exist && currentStatsUsers) {
       var userId = null;
       if(this.userId) userId = this.userId;
-      DaydStatsPath.insert({path: path, source_id: exist._id, createdAt: date});
+      DaydStatsPath.insert({path: path, source_id: exist._id, connection_id: connectionId, createdAt: date});
       DaydStats.update(exist._id, {
         $set: {"userId": userId, modifiedAt: date}
       });
@@ -28,7 +31,7 @@ Meteor.methods({
         stats.userId = this.userId;
 
       var lastInsert = DaydStats.insert(stats);
-      DaydStatsPath.insert({path: path, source_id: lastInsert, createdAt: new Date()});
+      DaydStatsPath.insert({path: path, source_id: lastInsert, connection_id:connectionId, createdAt: new Date()});
       DaydStatsReferer.update({referer: this.connection.headers.referer}, {$inc: {count: +1}}, {upsert: true});
       return lastInsert;
     }
