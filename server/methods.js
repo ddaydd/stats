@@ -72,13 +72,20 @@ Meteor.methods({
       stats.username = username;
     if(userEmail)
       stats.userEmail = userEmail;
-    var userStarted = DaydStatsUsers.insert(stats);
-    return userStarted;
+    //return DaydStatsUsers.insert(stats);
+    var isInDb = DaydStatsUsers.findOne({username: username}, {sort: {createdAt: -1}});
+    if(!isInDb){
+      return DaydStatsUsers.insert(stats);
+    } else if(isInDb  && !isInDb.finishedAt){
+      return true;
+    }else if(isInDb && isInDb.finishedAt){
+      return DaydStatsUsers.insert(stats);
+    }
   },
-  statsUserUpdate: function(currentStatsUserId) {
+  statsUserUpdate: function(userId) {
     var date = new Date();
-    console.log(currentStatsUserId);
-    return DaydStatsUsers.update({_id: currentStatsUserId}, {
+    var docInDb = DaydStatsUsers.findOne({userId: userId}, {sort: {createdAt: -1}});
+    return DaydStatsUsers.update({_id: docInDb._id}, {
       $set: {"finishedAt": date}
     });
   },
@@ -90,8 +97,26 @@ Meteor.methods({
           count: {$sum: 1}
         }
       }, {$sort: {count: -1}}])
-    }else{
+    } else {
       return DaydStatsUsers.find().count();
     }
+  },
+  getStatsDurationConnectionAverage: function() {
+    DaydStatsUsers.aggregate([{
+      $project: {
+        userEmail: 1,
+        connectionDuration: {$subtract: ["$finishedAt", "$startedAt"]}
+      }
+    },
+      {$out: "dayd_stats_output"}
+    ]);
+    return DaydStatsOutput.aggregate([{
+      $group: {
+        _id: "$userEmail",
+        avgConnectionDuration: {$avg: "$connectionDuration"}
+      }
+    }, {$sort: {avgConnectionDuration: -1}}])
   }
 });
+
+
