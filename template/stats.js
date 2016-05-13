@@ -116,6 +116,14 @@ Template.daydStatsPath.helpers({
   },
   connectionDuration: function(){
     return formatDuration(this.avgConnectionDuration);
+  },
+  pathPerConnection: function(){
+    Meteor.call('getPathsPerUserConnection', function(err, result){
+      if(err)
+        console.log(err);
+      Session.set('stats_pages_per_connection', result);
+    });
+    return Session.get('stats_pages_per_connection');
   }
 });
 
