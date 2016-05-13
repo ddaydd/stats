@@ -79,4 +79,14 @@
   {{#if isNumberTotalOfUsers}}
     <span> {{usersNumbers}} </span>
   {{/if}}
+  {{#if isUsersWithDuration}}
+    <ul class="list-group">
+      {{#each usersWithConnecitonDuration}}
+        <li class="list-group-item badge-inverse">
+          <span class="badge">{{connectionDuration}}</span>
+          {{this._id}}
+        </li>
+      {{/each}}
+    </ul>
+  {{/if}}
 </template>
