@@ -171,8 +171,22 @@ Meteor.methods({
       },
       {$sort: {avgConnectionPaths: -1}}
     ]);
+  },
+   getCustomStatsWithParameter: function(customName){
+     return DaydStatsCustom.aggregate([
+       {$match: {customName: customName}},
+       {
+         $group: {
+           _id: "$customId",
+           count: {$sum: 1}
+         }
+       },
+       {$sort: {count: -1}}
+     ]);
+   },
+  getCustomStatsCountWithParameter: function(customName){
+    return DaydStatsCustom.find({customName: customName}).count();
   }
-
 });
 
 
