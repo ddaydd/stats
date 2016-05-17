@@ -63,7 +63,12 @@ Meteor.methods({
   statsCustomInsert: function(customName, customId) {
     if(!this.userId || !customName || !customId) return;
 
-    return DaydStatsCustom.insert({customName: customName, customId: customId, createdAt: new Date()});
+    return DaydStatsCustom.insert({
+      customName: customName,
+      customId: customId,
+      createdAt: new Date(),
+      userId: this.userId
+    });
   },
 
   statsNotFilteredGroupedPathCount: function(custPaths) {
