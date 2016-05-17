@@ -136,18 +136,20 @@ Template.daydStatsPath.helpers({
     return formatDuration(this.avgConnectionPaths);
   },
   customStatsList: function() {
-    Meteor.call('getCustomStatsWithParameter', this.customName, function(err, resust) {
+    var c =this.customName;
+    Meteor.call('getCustomStatsWithParameter', c, function(err, resust) {
       if(err)console.log(err);
-      Session.set('stats_custom_listing', resust);
+      Session.set('stats_custom_listing'+c, resust);
     });
-    return Session.get('stats_custom_listing');
+    return Session.get('stats_custom_listing'+c);
   },
   customCountNumbers: function() {
-    Meteor.call('getCustomStatsCountWithParameter', this.customName, function(err, result) {
+    var c =this.customName;
+    Meteor.call('getCustomStatsCountWithParameter', c , function(err, result) {
       if(err) console.log(err);
-      Session.set('stats_count_per_custom_name', result);
+      Session.set('stats_count_per_custom_name_'+c, result);
     });
-    return Session.get('stats_count_per_custom_name');
+    return Session.get('stats_count_per_custom_name_'+c);
   }
 });
 
