@@ -99,4 +99,14 @@
       {{/each}}
     </ul>
   {{/if}}
+  {{#if isDurationEnterPaths}}
+    <ul class="list-group">
+      {{#each durationEnterPaths}}
+        <li class="list-group-item badge-inverse">
+          <span class="badge">{{durationPaths}}</span>
+          {{this._id}}
+        </li>
+      {{/each}}
+    </ul>
+  {{/if}}
 </template>
