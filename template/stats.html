@@ -109,4 +109,17 @@
       {{/each}}
     </ul>
   {{/if}}
+  {{#if isCustomStatsListing}}
+    <ul class="list-group">
+      {{#each customStatsList}}
+        <li class="list-group-item badge-inverse">
+          <span class="badge">{{this.count}}</span>
+          {{this._id}}
+        </li>
+      {{/each}}
+    </ul>
+  {{/if}}
+  {{#if isNumberTotalOfCustomCount}}
+    <span> {{customCountNumbers}} </span>
+  {{/if}}
 </template>
