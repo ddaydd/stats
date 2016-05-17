@@ -180,7 +180,7 @@ Meteor.methods({
        {$match: {customName: customName}},
        {
          $group: {
-           _id: "$customId",
+           _id: "$customDataName",
            count: {$sum: 1}
          }
        },
