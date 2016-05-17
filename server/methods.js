@@ -143,7 +143,7 @@ Meteor.methods({
         _id: "$userEmail",
         avgConnectionDuration: {$avg: "$connectionDuration"}
       }
-    }, {$sort: {avgConnectionDuration: -1}}])
+    }, {$sort: {avgConnectionDuration: -1}}]);
   },
 
   getPathsPerUserConnection: function() {
@@ -157,7 +157,7 @@ Meteor.methods({
         }
       },
       {$sort: {pages: -1}}
-    ])
+    ]);
   },
 
   getDurationConnectionPaths: function(customPaths) {
@@ -170,7 +170,7 @@ Meteor.methods({
         }
       },
       {$sort: {avgConnectionPaths: -1}}
-    ])
+    ]);
   }
 
 });
