@@ -126,11 +126,14 @@ Meteor.methods({
   },
   getPathsPerUserConnection: function() {
     return DaydStatsPath.aggregate([{
-      $group: {
-        _id: "$connection_id",
-        pages: {$sum: 1}
-      }
+      $match: {connection_id: {$ne: "root"}}
     },
+      {
+        $group: {
+          _id: "$connection_id",
+          pages: {$sum: 1}
+        }
+      },
       {$sort: {pages: -1}}
     ])
   }
