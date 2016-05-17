@@ -114,32 +114,48 @@ Template.daydStatsPath.helpers({
     });
     return Session.get('stats_user_with_duration');
   },
-  connectionDuration: function(){
+  connectionDuration: function() {
     return formatDuration(this.avgConnectionDuration);
   },
-  pathPerConnection: function(){
-    Meteor.call('getPathsPerUserConnection', function(err, result){
+  pathPerConnection: function() {
+    Meteor.call('getPathsPerUserConnection', function(err, result) {
       if(err)
         console.log(err);
       Session.set('stats_pages_per_connection', result);
     });
     return Session.get('stats_pages_per_connection');
   },
-  durationEnterPaths: function(){
-    Meteor.call('getDurationConnectionPaths', this.customPaths, function(err, result){
+  durationEnterPaths: function() {
+    Meteor.call('getDurationConnectionPaths', this.customPaths, function(err, result) {
       if(err)console.log(err);
       Session.set('stats_duration_enter_paths', result);
     });
     return Session.get('stats_duration_enter_paths');
   },
-  durationPaths: function(){
-  return formatDuration(this.avgConnectionPaths);
-}
+  durationPaths: function() {
+    return formatDuration(this.avgConnectionPaths);
+  },
+  customStatsList: function() {
+    var c =this.customName;
+    Meteor.call('getCustomStatsWithParameter', c, function(err, resust) {
+      if(err)console.log(err);
+      Session.set('stats_custom_listing'+c, resust);
+    });
+    return Session.get('stats_custom_listing'+c);
+  },
+  customCountNumbers: function() {
+    var c =this.customName;
+    Meteor.call('getCustomStatsCountWithParameter', c , function(err, result) {
+      if(err) console.log(err);
+      Session.set('stats_count_per_custom_name_'+c, result);
+    });
+    return Session.get('stats_count_per_custom_name_'+c);
+  }
 });
 
 function formatDuration(ms) {
   var duration = moment.duration(ms);
-  if (duration.asHours() > 1) {
+  if(duration.asHours() > 1) {
     return Math.floor(duration.asHours()) + moment.utc(duration.asMilliseconds()).format(":mm:ss");
   } else {
     return moment.utc(duration.asMilliseconds()).format("mm:ss");

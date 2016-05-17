@@ -146,7 +146,7 @@ Meteor.methods({
         _id: "$userEmail",
         avgConnectionDuration: {$avg: "$connectionDuration"}
       }
-    }, {$sort: {avgConnectionDuration: -1}}])
+    }, {$sort: {avgConnectionDuration: -1}}]);
   },
 
   getPathsPerUserConnection: function() {
@@ -160,7 +160,7 @@ Meteor.methods({
         }
       },
       {$sort: {pages: -1}}
-    ])
+    ]);
   },
 
   getDurationConnectionPaths: function(customPaths) {
@@ -173,9 +173,23 @@ Meteor.methods({
         }
       },
       {$sort: {avgConnectionPaths: -1}}
-    ])
+    ]);
+  },
+   getCustomStatsWithParameter: function(customName){
+     return DaydStatsCustom.aggregate([
+       {$match: {customName: customName}},
+       {
+         $group: {
+           _id: "$customId",
+           count: {$sum: 1}
+         }
+       },
+       {$sort: {count: -1}}
+     ]);
+   },
+  getCustomStatsCountWithParameter: function(customName){
+    return DaydStatsCustom.find({customName: customName}).count();
   }
-
 });
 
 
