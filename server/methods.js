@@ -60,15 +60,18 @@ Meteor.methods({
 
   },
 
-  statsCustomInsert: function(customName, customId) {
+  statsCustomInsert: function(customName, customId, customDataName) {
     if(!this.userId || !customName || !customId) return;
 
-    return DaydStatsCustom.insert({
+    var customData = {
       customName: customName,
       customId: customId,
       createdAt: new Date(),
       userId: this.userId
-    });
+    };
+
+    if(customDataName) customData.customDataName = customDataName;
+    return DaydStatsCustom.insert(customData);
   },
 
   statsNotFilteredGroupedPathCount: function(custPaths) {
