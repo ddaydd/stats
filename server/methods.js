@@ -15,6 +15,9 @@ Meteor.methods({
     if(exist && currentStatsUsers) {
       var userId = null;
       if(this.userId) userId = this.userId;
+      var lastPathDoc = DaydStatsPath.findOne({source_id: exist._id}, {sort: {createdAt: -1}});
+      if(lastPathDoc)
+        DaydStatsPath.update({_id: lastPathDoc._id}, {$set: {endedAt: date}});
       DaydStatsPath.insert({path: path, source_id: exist._id, connection_id: connectionId, createdAt: date});
       DaydStats.update(exist._id, {
         $set: {"userId": userId, modifiedAt: date}
@@ -35,6 +38,9 @@ Meteor.methods({
         stats.userId = this.userId;
 
       var lastInsert = DaydStats.insert(stats);
+      var lastPathDoc = DaydStatsPath.findOne({source_id: exist._id}, {sort: {createdAt: -1}});
+      if(lastPathDoc)
+        DaydStatsPath.update({_id: lastPathDoc._id}, {$set: {endedAt: date}});
       DaydStatsPath.insert({path: path, source_id: lastInsert, connection_id: connectionId, createdAt: new Date()});
       DaydStatsReferer.update({referer: this.connection.headers.referer}, {$inc: {count: +1}}, {upsert: true});
       return lastInsert;
@@ -135,6 +141,18 @@ Meteor.methods({
         }
       },
       {$sort: {pages: -1}}
+    ])
+  },
+  getDurationConnectionPaths: function(customPaths) {
+    return DaydStatsPath.aggregate([
+      {$match: {path: {$in: customPaths}}},
+      {
+        $group: {
+          _id: "$path",
+          avgConnectionPaths: {$avg: {$subtract: ["$endedAt", "$createdAt"]}}
+        }
+      },
+      {$sort: {avgConnectionPaths: -1}}
     ])
   }
 });
