@@ -124,7 +124,17 @@ Template.daydStatsPath.helpers({
       Session.set('stats_pages_per_connection', result);
     });
     return Session.get('stats_pages_per_connection');
-  }
+  },
+  durationEnterPaths: function(){
+    Meteor.call('getDurationConnectionPaths', this.customPaths, function(err, result){
+      if(err)console.log(err);
+      Session.set('stats_duration_enter_paths', result);
+    });
+    return Session.get('stats_duration_enter_paths');
+  },
+  durationPaths: function(){
+  return formatDuration(this.avgConnectionPaths);
+}
 });
 
 function formatDuration(ms) {
