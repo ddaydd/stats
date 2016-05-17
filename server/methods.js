@@ -60,6 +60,12 @@ Meteor.methods({
 
   },
 
+  statsCustomInsert: function(customName, customId) {
+    if(!this.userId || !customName || !customId) return;
+
+    return DaydStatsCustom.insert({customName: customName, customId: customId, createdAt: new Date()});
+  },
+
   statsNotFilteredGroupedPathCount: function(custPaths) {
     return DaydStatsPath.aggregate([{$match: {path: {$in: custPaths}}}, {
       $group: {
@@ -68,6 +74,7 @@ Meteor.methods({
       }
     }, {$sort: {count: -1}}, {$limit: 5}]);
   },
+
   statsUserInsert: function(username, userEmail) {
     var ip = this.connection.httpHeaders['x-forwarded-for'] || this.connection.clientAddress;
     var date = new Date();
@@ -95,6 +102,7 @@ Meteor.methods({
       return DaydStatsUsers.insert(stats);
     }
   },
+
   statsUserUpdate: function(userId) {
     var date = new Date();
     var docInDb = DaydStatsUsers.findOne({userId: userId}, {sort: {createdAt: -1}});
@@ -102,6 +110,7 @@ Meteor.methods({
       $set: {"finishedAt": date}
     });
   },
+
   statsUsersCount: function(distinct) {
     if(distinct) {
       return DaydStatsUsers.aggregate([{
@@ -114,6 +123,7 @@ Meteor.methods({
       return DaydStatsUsers.find().count();
     }
   },
+
   getStatsDurationConnectionAverage: function() {
     DaydStatsUsers.aggregate([{
       $project: {
@@ -130,6 +140,7 @@ Meteor.methods({
       }
     }, {$sort: {avgConnectionDuration: -1}}])
   },
+
   getPathsPerUserConnection: function() {
     return DaydStatsPath.aggregate([{
       $match: {connection_id: {$ne: "root"}}
@@ -143,6 +154,7 @@ Meteor.methods({
       {$sort: {pages: -1}}
     ])
   },
+
   getDurationConnectionPaths: function(customPaths) {
     return DaydStatsPath.aggregate([
       {$match: {path: {$in: customPaths}}},
@@ -155,6 +167,7 @@ Meteor.methods({
       {$sort: {avgConnectionPaths: -1}}
     ])
   }
+
 });
 
 
