@@ -184,7 +184,8 @@ Meteor.methods({
            count: {$sum: 1}
          }
        },
-       {$sort: {count: -1}}
+       {$sort: {count: -1}},
+       {$limit: 10}
      ]);
    },
   getCustomStatsCountWithParameter: function(customName){
