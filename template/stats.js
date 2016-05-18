@@ -150,6 +150,13 @@ Template.daydStatsPath.helpers({
       Session.set('stats_count_per_custom_name_'+c, result);
     });
     return Session.get('stats_count_per_custom_name_'+c);
+  },
+  usersConnectedInRealTime: function(){
+    Meteor.call('getStatsUsersConnectedInRealTime', function(err, res){
+      if(err)console.log(err);
+      Session.set('stats_users_connected_in_real_time', res);
+    });
+    return Session.get('stats_users_connected_in_real_time');
   }
 });
 
