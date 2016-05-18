@@ -122,4 +122,15 @@
   {{#if isNumberTotalOfCustomCount}}
     <span> {{customCountNumbers}} </span>
   {{/if}}
+
+  {{#if isUsersConnectedInRealTime}}
+    <ul class="list-group">
+      {{#each usersConnectedInRealTime}}
+        <li class="list-group-item badge-inverse">
+          <span class="badge">Online</span>
+          {{this._id}}
+        </li>
+      {{/each}}
+    </ul>
+  {{/if}}
 </template>
