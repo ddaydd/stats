@@ -175,21 +175,28 @@ Meteor.methods({
       {$sort: {avgConnectionPaths: -1}}
     ]);
   },
-   getCustomStatsWithParameter: function(customName){
-     return DaydStatsCustom.aggregate([
-       {$match: {customName: customName}},
-       {
-         $group: {
-           _id: "$customDataName",
-           count: {$sum: 1}
-         }
-       },
-       {$sort: {count: -1}},
-       {$limit: 10}
-     ]);
-   },
-  getCustomStatsCountWithParameter: function(customName){
+  getCustomStatsWithParameter: function(customName) {
+    return DaydStatsCustom.aggregate([
+      {$match: {customName: customName}},
+      {
+        $group: {
+          _id: "$customDataName",
+          count: {$sum: 1}
+        }
+      },
+      {$sort: {count: -1}},
+      {$limit: 10}
+    ]);
+  },
+  getCustomStatsCountWithParameter: function(customName) {
     return DaydStatsCustom.find({customName: customName}).count();
+  },
+  getStatsUsersConnectedInRealTime: function() {
+    return DaydStatsUsers.aggregate([
+      {$match: {"finishedAt": {'$exists': false}}},
+      {$group: {_id: "$userEmail", count: {$sum: 1}}},
+      {$sort: {count: -1}}
+    ]);
   }
 });
 
