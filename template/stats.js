@@ -157,6 +157,10 @@ Template.daydStatsPath.helpers({
       Session.set('stats_users_connected_in_real_time', res);
     });
     return Session.get('stats_users_connected_in_real_time');
+  },
+  numberOfUsersConnected: function(){
+    var u = Session.get('stats_users_connected_in_real_time');
+    return u.length;
   }
 });
 
