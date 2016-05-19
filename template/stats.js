@@ -176,6 +176,9 @@ Template.daydStatsPath.helpers({
       return Session.set('stats_visits_number_per_user', res);
     });
     return Session.get('stats_visits_number_per_user');
+  },
+  avgRound: function(nbr){
+    return Math.round(nbr);
   }
 });
 
