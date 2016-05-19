@@ -86,13 +86,23 @@ Meteor.methods({
     return DaydStatsCustom.insert(customData);
   },
 
-  statsNotFilteredGroupedPathCount: function(custPaths) {
-    return DaydStatsPath.aggregate([{$match: {path: {$in: custPaths}}}, {
-      $group: {
-        _id: "$path",
-        count: {$sum: 1}
-      }
-    }, {$sort: {count: -1}}, {$limit: 5}]);
+  statsNotFilteredGroupedPathCount: function(custPaths, userIds, all) {
+    if(custPaths && userIds && all) {
+      return DaydStatsPath.aggregate([{$match: {path: {$in: custPaths}, userId: {$in: userIds}}}, {
+        $group: {
+          _id: "$path",
+          count: {$sum: 1}
+        }
+      }, {$sort: {count: -1}}, {$limit: 3}]);
+    } else {
+      return DaydStatsPath.aggregate([{$match: {path: {$in: custPaths}}}, {
+        $group: {
+          _id: "$path",
+          count: {$sum: 1}
+        }
+      }, {$sort: {count: -1}}, {$limit: 3}]);
+    }
+
   },
 
   statsUserInsert: function(username, userEmail) {
