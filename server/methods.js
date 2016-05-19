@@ -144,7 +144,7 @@ Meteor.methods({
     }
   },
 
-  getStatsDurationConnectionAverage: function() {
+  getStatsDurationConnectionAverage: function(userId) {
     DaydStatsUsers.aggregate([{
       $project: {
         userEmail: 1,
@@ -154,6 +154,15 @@ Meteor.methods({
     },
       {$out: "dayd_stats_output"}
     ]);
+    if(userId)
+      return DaydStatsOutput.aggregate([
+        {$match: {userId: userId}},
+        {
+          $group: {
+            _id: "$userEmail",
+            avgConnectionDuration: {$avg: "$connectionDuration"}
+          }
+        }, {$sort: {avgConnectionDuration: -1}}]);
     return DaydStatsOutput.aggregate([{
       $group: {
         _id: "$userEmail",
@@ -191,7 +200,7 @@ Meteor.methods({
 
   getCustomStatsWithParameter: function(customName) {
     return DaydStatsCustom.aggregate([
-      {$match: {customName: customName}},
+      {$match: {customName: customName, customDataName: {'$exists': true}}},
       {
         $group: {
           _id: "$customDataName",
@@ -204,7 +213,7 @@ Meteor.methods({
   },
 
   getCustomStatsCountWithParameter: function(customName) {
-    return DaydStatsCustom.find({customName: customName}).count();
+    return DaydStatsCustom.find({customName: customName , customDataName: {'$exists': true}}).count();
   },
 
   getStatsUsersConnectedInRealTime: function() {
@@ -221,7 +230,7 @@ Meteor.methods({
       return lastUserConnection.createdAt;
   },
 
-  getNumberStatsVisitsPerUser: function(userId){
+  getNumberStatsVisitsPerUser: function(userId) {
     return DaydStatsUsers.aggregate([
       {$match: {'userId': userId}},
       {$group: {_id: "$userEmail", count: {$sum: 1}}}
