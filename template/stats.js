@@ -136,31 +136,32 @@ Template.daydStatsPath.helpers({
     return formatDuration(this.avgConnectionPaths);
   },
   customStatsList: function() {
-    var c =this.customName;
+    var c = this.customName;
     Meteor.call('getCustomStatsWithParameter', c, function(err, resust) {
       if(err)console.log(err);
-      Session.set('stats_custom_listing'+c, resust);
+      Session.set('stats_custom_listing' + c, resust);
     });
-    return Session.get('stats_custom_listing'+c);
+    return Session.get('stats_custom_listing' + c);
   },
   customCountNumbers: function() {
-    var c =this.customName;
-    Meteor.call('getCustomStatsCountWithParameter', c , function(err, result) {
+    var c = this.customName;
+    Meteor.call('getCustomStatsCountWithParameter', c, function(err, result) {
       if(err) console.log(err);
-      Session.set('stats_count_per_custom_name_'+c, result);
+      Session.set('stats_count_per_custom_name_' + c, result);
     });
-    return Session.get('stats_count_per_custom_name_'+c);
+    return Session.get('stats_count_per_custom_name_' + c);
   },
-  usersConnectedInRealTime: function(){
-    Meteor.call('getStatsUsersConnectedInRealTime', function(err, res){
+  usersConnectedInRealTime: function() {
+    Meteor.call('getStatsUsersConnectedInRealTime', function(err, res) {
       if(err)console.log(err);
       Session.set('stats_users_connected_in_real_time', res);
     });
     return Session.get('stats_users_connected_in_real_time');
   },
-  numberOfUsersConnected: function(){
+  numberOfUsersConnected: function() {
     var u = Session.get('stats_users_connected_in_real_time');
-    return u.length;
+    if(u)
+      return u.length;
   }
 });
 
