@@ -173,12 +173,21 @@ Meteor.methods({
     }
   },
 
-  getPathsPerUserConnection: function() {
-    return DaydStatsPath.aggregate([{$match:{userId:{'$exists': true},connection_id: {$ne: "root"}}},
-      {$group: {"_id":{"connex": "$connection_id", "userId":"$userId"}, "pagesViewed": {$sum: 1}}},
-      {$group: {"_id": "$_id.userId", "avgPagesViewed":{$avg: "$pagesViewed"}}},
-      {$sort: {avgPagesViewed: -1}}
-    ]);
+  getPathsPerUserConnection: function(userIds, all) {
+    if(userIds && all) {
+      return DaydStatsPath.aggregate([{$match: {userId: {$in: userIds}, connection_id: {$ne: "root"}}},
+        {$group: {"_id": {"connex": "$connection_id", "userId": "$userId"}, "pagesViewed": {$sum: 1}}},
+        {$group: {"_id": "$_id.userId", "avgPagesViewed": {$avg: "$pagesViewed"}}},
+        {$sort: {avgPagesViewed: -1}}
+      ]);
+    } else {
+      return DaydStatsPath.aggregate([{$match: {userId: {'$exists': true}, connection_id: {$ne: "root"}}},
+        {$group: {"_id": {"connex": "$connection_id", "userId": "$userId"}, "pagesViewed": {$sum: 1}}},
+        {$group: {"_id": "$_id.userId", "avgPagesViewed": {$avg: "$pagesViewed"}}},
+        {$sort: {avgPagesViewed: -1}}
+      ]);
+    }
+
   },
 
   getDurationConnectionPaths: function(customPaths) {
