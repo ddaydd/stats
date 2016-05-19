@@ -139,4 +139,14 @@
   {{#if isUserLastDateConnection}}
     <span> {{lastDateConnection}} </span>
   {{/if}}
+  {{#if isVisitsNumberPerUser}}
+    <ul class="list-group">
+      {{#each numberVisitsPerUser}}
+        <li class="list-group-item badge-inverse">
+          <span class="badge">{{this.count}}</span>
+          {{this._id}}
+        </li>
+      {{/each}}
+    </ul>
+  {{/if}}
 </template>
