@@ -219,6 +219,13 @@ Meteor.methods({
     var lastUserConnection = DaydStatsUsers.findOne({userId: userId}, {sort: {createdAt: -1}});
     if(lastUserConnection)
       return lastUserConnection.createdAt;
+  },
+
+  getNumberStatsVisitsPerUser: function(userId){
+    return DaydStatsUsers.aggregate([
+      {$match: {'userId': userId}},
+      {$group: {_id: "$userEmail", count: {$sum: 1}}}
+    ]);
   }
 });
 
