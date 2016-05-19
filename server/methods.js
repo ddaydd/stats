@@ -136,6 +136,7 @@ Meteor.methods({
     DaydStatsUsers.aggregate([{
       $project: {
         userEmail: 1,
+        userId: 1,
         connectionDuration: {$subtract: ["$finishedAt", "$startedAt"]}
       }
     },
