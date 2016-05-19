@@ -169,6 +169,13 @@ Template.daydStatsPath.helpers({
       return Session.set('stats_user_last_date_connection', res);
     });
     return Session.get('stats_user_last_date_connection');
+  },
+  numberVisitsPerUser: function(){
+    Meteor.call('getNumberStatsVisitsPerUser', this.userSelected, function(err, res){
+      if(err) console.log(err);
+      return Session.set('stats_visits_number_per_user', res);
+    });
+    return Session.get('stats_visits_number_per_user');
   }
 });
 
