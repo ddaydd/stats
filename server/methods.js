@@ -144,7 +144,7 @@ Meteor.methods({
     }
   },
 
-  getStatsDurationConnectionAverage: function(userId) {
+  getStatsDurationConnectionAverage: function(userIds, all) {
     DaydStatsUsers.aggregate([{
       $project: {
         userEmail: 1,
@@ -154,21 +154,23 @@ Meteor.methods({
     },
       {$out: "dayd_stats_output"}
     ]);
-    if(userId)
+    if(userIds && all) {
       return DaydStatsOutput.aggregate([
-        {$match: {userId: userId}},
+        {$match: {userId: {$in: userIds}}},
         {
           $group: {
             _id: "$userEmail",
             avgConnectionDuration: {$avg: "$connectionDuration"}
           }
         }, {$sort: {avgConnectionDuration: -1}}]);
-    return DaydStatsOutput.aggregate([{
-      $group: {
-        _id: "$userEmail",
-        avgConnectionDuration: {$avg: "$connectionDuration"}
-      }
-    }, {$sort: {avgConnectionDuration: -1}}]);
+    } else {
+      return DaydStatsOutput.aggregate([{
+        $group: {
+          _id: "$userEmail",
+          avgConnectionDuration: {$avg: "$connectionDuration"}
+        }
+      }, {$sort: {avgConnectionDuration: -1}}]);
+    }
   },
 
   getPathsPerUserConnection: function() {
@@ -213,7 +215,7 @@ Meteor.methods({
   },
 
   getCustomStatsCountWithParameter: function(customName) {
-    return DaydStatsCustom.find({customName: customName , customDataName: {'$exists': true}}).count();
+    return DaydStatsCustom.find({customName: customName, customDataName: {'$exists': true}}).count();
   },
 
   getStatsUsersConnectedInRealTime: function() {
@@ -225,12 +227,12 @@ Meteor.methods({
   },
 
   /*getStatsUsersLastConnection: function(userIds) {
-    return DaydStatsUsers.aggregate([
-      {$match: {userId:{$in: userIds}}},
-      {$group: {_id: "$userEmail", count: {$sum: 1}}}
-    ]);
+   return DaydStatsUsers.aggregate([
+   {$match: {userId:{$in: userIds}}},
+   {$group: {_id: "$userEmail", count: {$sum: 1}}}
+   ]);
 
-  },*/
+   },*/
 
   getNumberStatsVisitsPerUser: function(userIds) {
     return DaydStatsUsers.aggregate([
