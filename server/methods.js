@@ -18,7 +18,7 @@ Meteor.methods({
       var lastPathDoc = DaydStatsPath.findOne({source_id: exist._id}, {sort: {createdAt: -1}});
       if(lastPathDoc)
         DaydStatsPath.update({_id: lastPathDoc._id}, {$set: {endedAt: date}});
-      DaydStatsPath.insert({path: path, source_id: exist._id, connection_id: connectionId, createdAt: date});
+      DaydStatsPath.insert({path: path, source_id: exist._id, connection_id: connectionId, userId: userId, createdAt: date});
       DaydStats.update(exist._id, {
         $set: {"userId": userId, modifiedAt: date}
       });
@@ -41,7 +41,7 @@ Meteor.methods({
       var lastPathDoc = DaydStatsPath.findOne({source_id: exist._id}, {sort: {createdAt: -1}});
       if(lastPathDoc)
         DaydStatsPath.update({_id: lastPathDoc._id}, {$set: {endedAt: date}});
-      DaydStatsPath.insert({path: path, source_id: lastInsert, connection_id: connectionId, createdAt: new Date()});
+      DaydStatsPath.insert({path: path, source_id: lastInsert, connection_id: connectionId, userId: stats.userId, createdAt: new Date()});
       DaydStatsReferer.update({referer: this.connection.headers.referer}, {$inc: {count: +1}}, {upsert: true});
       return lastInsert;
     }
