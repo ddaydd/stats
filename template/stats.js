@@ -163,13 +163,13 @@ Template.daydStatsPath.helpers({
     if(u)
       return u.length;
   },
-  lastDateConnection: function(){
+  /*lastDateConnection: function(){
     Meteor.call('getStatsUsersLastConnection', this.userSelected, function(err, res){
       if(err) console.log(err);
       return Session.set('stats_user_last_date_connection', res);
     });
     return Session.get('stats_user_last_date_connection');
-  },
+  },*/
   numberVisitsPerUser: function(){
     Meteor.call('getNumberStatsVisitsPerUser', this.userSelected, function(err, res){
       if(err) console.log(err);
