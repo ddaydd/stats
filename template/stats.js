@@ -83,7 +83,7 @@ Template.daydStats.events({
 });
 Template.daydStatsPath.helpers({
   statsByPath: function() {
-    Meteor.call("statsNotFilteredGroupedPathCount", this.customPath, function(err, result) {
+    Meteor.call("statsNotFilteredGroupedPathCount", this.customPath, this.userSelected, this.all, function(err, result) {
       if(err)
         return console.log(err);
       Session.set('stats_list_by_path', result);
