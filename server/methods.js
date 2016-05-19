@@ -18,7 +18,13 @@ Meteor.methods({
       var lastPathDoc = DaydStatsPath.findOne({source_id: exist._id}, {sort: {createdAt: -1}});
       if(lastPathDoc)
         DaydStatsPath.update({_id: lastPathDoc._id}, {$set: {endedAt: date}});
-      DaydStatsPath.insert({path: path, source_id: exist._id, connection_id: connectionId, userId: userId, createdAt: date});
+      DaydStatsPath.insert({
+        path: path,
+        source_id: exist._id,
+        connection_id: connectionId,
+        userId: userId,
+        createdAt: date
+      });
       DaydStats.update(exist._id, {
         $set: {"userId": userId, modifiedAt: date}
       });
@@ -41,7 +47,13 @@ Meteor.methods({
       var lastPathDoc = DaydStatsPath.findOne({source_id: exist._id}, {sort: {createdAt: -1}});
       if(lastPathDoc)
         DaydStatsPath.update({_id: lastPathDoc._id}, {$set: {endedAt: date}});
-      DaydStatsPath.insert({path: path, source_id: lastInsert, connection_id: connectionId, userId: stats.userId, createdAt: new Date()});
+      DaydStatsPath.insert({
+        path: path,
+        source_id: lastInsert,
+        connection_id: connectionId,
+        userId: stats.userId,
+        createdAt: new Date()
+      });
       DaydStatsReferer.update({referer: this.connection.headers.referer}, {$inc: {count: +1}}, {upsert: true});
       return lastInsert;
     }
@@ -176,6 +188,7 @@ Meteor.methods({
       {$sort: {avgConnectionPaths: -1}}
     ]);
   },
+
   getCustomStatsWithParameter: function(customName) {
     return DaydStatsCustom.aggregate([
       {$match: {customName: customName}},
@@ -189,15 +202,23 @@ Meteor.methods({
       {$limit: 10}
     ]);
   },
+
   getCustomStatsCountWithParameter: function(customName) {
     return DaydStatsCustom.find({customName: customName}).count();
   },
+
   getStatsUsersConnectedInRealTime: function() {
     return DaydStatsUsers.aggregate([
       {$match: {"finishedAt": {'$exists': false}}},
       {$group: {_id: "$userEmail", count: {$sum: 1}}},
       {$sort: {count: -1}}
     ]);
+  },
+
+  getStatsUsersLastConnection: function(userId) {
+    var lastUserConnection = DaydStatsUsers.findOne({userId: userId}, {sort: {createdAt: -1}});
+    if(lastUserConnection)
+      return lastUserConnection.createdAt;
   }
 });
 
