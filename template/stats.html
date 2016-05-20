@@ -137,7 +137,15 @@
     <span> {{numberOfUsersConnected}} </span>
   {{/if}}
   {{#if isUserLastDateConnection}}
-    <span> {{lastDateConnection}} </span>
+    <!--<span> {{lastDateConnection}} </span>-->
+    <ul class="list-group">
+      {{#each lastDateConnection}}
+        <li class="list-group-item badge-inverse">
+          <span class="badge">{{formatDate this.date}}</span>
+          {{getUserById this._id}}
+        </li>
+      {{/each}}
+    </ul>
   {{/if}}
   {{#if isVisitsNumberPerUser}}
     <ul class="list-group">
