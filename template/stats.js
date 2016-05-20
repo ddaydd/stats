@@ -126,7 +126,7 @@ Template.daydStatsPath.helpers({
     return Session.get('stats_pages_per_connection');
   },
   durationEnterPaths: function() {
-    Meteor.call('getDurationConnectionPaths', this.customPaths, function(err, result) {
+    Meteor.call('getDurationConnectionPaths', this.customPaths, this.userSelected, this.all, function(err, result) {
       if(err)console.log(err);
       Session.set('stats_duration_enter_paths', result);
     });
