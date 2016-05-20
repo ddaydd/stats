@@ -54,7 +54,7 @@ Meteor.methods({
         userId: stats.userId,
         createdAt: new Date()
       });
-      DaydStatsReferer.update({referer: this.connection.headers.referer}, {$inc: {count: +1}}, {upsert: true});
+      if(this.connection && this.connection.headers) DaydStatsReferer.update({referer: this.connection.headers.referer}, {$inc: {count: +1}}, {upsert: true});
       return lastInsert;
     }
 
