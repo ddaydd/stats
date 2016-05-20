@@ -163,13 +163,13 @@ Template.daydStatsPath.helpers({
     if(u)
       return u.length;
   },
-  /*lastDateConnection: function(){
+  lastDateConnection: function(){
     Meteor.call('getStatsUsersLastConnection', this.userSelected, function(err, res){
       if(err) console.log(err);
-      return Session.set('stats_user_last_date_connection', res);
+      return Session.set('stats_user_last_connection_', res);
     });
-    return Session.get('stats_user_last_date_connection');
-  },*/
+    return Session.get('stats_user_last_connection_');
+  },
   numberVisitsPerUser: function(){
     Meteor.call('getNumberStatsVisitsPerUser', this.userSelected, function(err, res){
       if(err) console.log(err);
@@ -179,6 +179,9 @@ Template.daydStatsPath.helpers({
   },
   avgRound: function(nbr){
     return Math.round(nbr);
+  },
+  formatDate: function(date){
+    return moment(date).format('DD/MM/YYYY  hh:mm');
   }
 });
 
