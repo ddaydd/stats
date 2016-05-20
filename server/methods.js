@@ -225,18 +225,32 @@ Meteor.methods({
     ]);
   },
 
-  getCustomStatsWithParameter: function(customName) {
-    return DaydStatsCustom.aggregate([
-      {$match: {customName: customName, customDataName: {'$exists': true}}},
-      {
-        $group: {
-          _id: "$customDataName",
-          count: {$sum: 1}
-        }
-      },
-      {$sort: {count: -1}},
-      {$limit: 10}
-    ]);
+  getCustomStatsWithParameter: function(customName, userIds, all) {
+    if(customName && userIds && all) {
+      return DaydStatsCustom.aggregate([
+        {$match: {customName: customName, userId: {$in: userIds}, customDataName: {'$exists': true}}},
+        {
+          $group: {
+            _id: "$customDataName",
+            count: {$sum: 1}
+          }
+        },
+        {$sort: {count: -1}},
+        {$limit: 10}
+      ]);
+    } else {
+      return DaydStatsCustom.aggregate([
+        {$match: {customName: customName, customDataName: {'$exists': true}}},
+        {
+          $group: {
+            _id: "$customDataName",
+            count: {$sum: 1}
+          }
+        },
+        {$sort: {count: -1}},
+        {$limit: 10}
+      ]);
+    }
   },
 
   getCustomStatsCountWithParameter: function(customName, userIds, all) {

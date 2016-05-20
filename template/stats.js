@@ -137,7 +137,7 @@ Template.daydStatsPath.helpers({
   },
   customStatsList: function() {
     var c = this.customName;
-    Meteor.call('getCustomStatsWithParameter', c, function(err, resust) {
+    Meteor.call('getCustomStatsWithParameter', c, this.userSelected, this.all, function(err, resust) {
       if(err)console.log(err);
       Session.set('stats_custom_listing' + c, resust);
     });
