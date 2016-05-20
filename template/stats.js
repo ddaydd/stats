@@ -182,7 +182,7 @@ Template.daydStatsPath.helpers({
     return Math.round(nbr);
   },
   formatDate: function(date) {
-    return moment(date).format('DD/MM/YYYY  hh:mm');
+    return moment(date).format('DD/MM/YYYY  hh:mm A');
   }
 });
 
