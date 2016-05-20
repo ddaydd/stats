@@ -86,16 +86,21 @@ Meteor.methods({
     return DaydStatsCustom.insert(customData);
   },
 
-  statsNotFilteredGroupedPathCount: function(custPaths, userIds, all) {
-    if(custPaths && userIds && all) {
-      return DaydStatsPath.aggregate([{$match: {path: {$in: custPaths}, userId: {$in: userIds}}}, {
+  statsNotFilteredGroupedPathCount: function(custPaths, userIds, all, hide) {
+    if(custPaths && userIds && all && hide) {
+      return DaydStatsPath.aggregate([{
+        "$match": {
+          "path": {"$in": custPaths},
+          "userId": {"$in": userIds, $nin: hide}
+        }
+      }, {
         $group: {
           _id: "$path",
           count: {$sum: 1}
         }
       }, {$sort: {count: -1}}, {$limit: 3}]);
     } else {
-      return DaydStatsPath.aggregate([{$match: {path: {$in: custPaths}}}, {
+      return DaydStatsPath.aggregate([{"$match": {"path": {"$in": custPaths}, "userId": {"$nin": hide}}}, {
         $group: {
           _id: "$path",
           count: {$sum: 1}
@@ -141,20 +146,24 @@ Meteor.methods({
     });
   },
 
-  statsUsersCount: function(distinct) {
-    if(distinct) {
-      return DaydStatsUsers.aggregate([{
-        $group: {
-          _id: "$userEmail",
-          count: {$sum: 1}
-        }
-      }, {$sort: {count: -1}}])
-    } else {
-      return DaydStatsUsers.find().count();
+  statsUsersDistinct: function(distinct, hide) {
+    if(distinct && hide) {
+      return DaydStatsUsers.aggregate([
+        {$match: {userId: {$nin: hide}}},
+        {
+          $group: {
+            _id: "$userEmail",
+            count: {$sum: 1}
+          }
+        }, {$sort: {count: -1}}])
     }
   },
+  statsUsersCount: function(hide) {
+    return DaydStatsUsers.find({userId: {$nin: hide}}).count();
+  }
+  ,
 
-  getStatsDurationConnectionAverage: function(userIds, all) {
+  getStatsDurationConnectionAverage: function(userIds, all, hide) {
     DaydStatsUsers.aggregate([{
       $project: {
         userEmail: 1,
@@ -164,9 +173,9 @@ Meteor.methods({
     },
       {$out: "dayd_stats_output"}
     ]);
-    if(userIds && all) {
+    if(userIds && all && hide) {
       return DaydStatsOutput.aggregate([
-        {$match: {userId: {$in: userIds}}},
+        {$match: {userId: {$in: userIds, $nin: hide}}},
         {
           $group: {
             _id: "$userEmail",
@@ -174,24 +183,26 @@ Meteor.methods({
           }
         }, {$sort: {avgConnectionDuration: -1}}]);
     } else {
-      return DaydStatsOutput.aggregate([{
-        $group: {
-          _id: "$userEmail",
-          avgConnectionDuration: {$avg: "$connectionDuration"}
-        }
-      }, {$sort: {avgConnectionDuration: -1}}]);
+      return DaydStatsOutput.aggregate([
+        {$match: {userId: {$nin: hide}}},
+        {
+          $group: {
+            _id: "$userEmail",
+            avgConnectionDuration: {$avg: "$connectionDuration"}
+          }
+        }, {$sort: {avgConnectionDuration: -1}}]);
     }
   },
 
-  getPathsPerUserConnection: function(userIds, all) {
-    if(userIds && all) {
-      return DaydStatsPath.aggregate([{$match: {userId: {$in: userIds}, connection_id: {$ne: "root"}}},
+  getPathsPerUserConnection: function(userIds, all, hide) {
+    if(userIds && all && hide) {
+      return DaydStatsPath.aggregate([{$match: {userId: {$in: userIds, $nin: hide}, connection_id: {$ne: "root"}}},
         {$group: {"_id": {"connex": "$connection_id", "userId": "$userId"}, "pagesViewed": {$sum: 1}}},
         {$group: {"_id": "$_id.userId", "avgPagesViewed": {$avg: "$pagesViewed"}}},
         {$sort: {avgPagesViewed: -1}}
       ]);
     } else {
-      return DaydStatsPath.aggregate([{$match: {userId: {'$exists': true}, connection_id: {$ne: "root"}}},
+      return DaydStatsPath.aggregate([{$match: {userId: {'$exists': true, $nin: hide}, connection_id: {$ne: "root"}}},
         {$group: {"_id": {"connex": "$connection_id", "userId": "$userId"}, "pagesViewed": {$sum: 1}}},
         {$group: {"_id": "$_id.userId", "avgPagesViewed": {$avg: "$pagesViewed"}}},
         {$sort: {avgPagesViewed: -1}}
@@ -200,10 +211,21 @@ Meteor.methods({
 
   },
 
-  getDurationConnectionPaths: function(customPaths, userIds, all) {
-    if(customPaths && userIds && all) {
+  getDurationConnectionPaths: function(customPaths, userIds, all, hide) {
+    if(customPaths && userIds && all && hide) {
       return DaydStatsPath.aggregate([
-        {$match: {path: {$in: customPaths}, userId: {$in: userIds}}},
+        {$match: {path: {$in: customPaths}, userId: {$in: userIds, $nin: hide}}},
+        {
+          $group: {
+            _id: "$path",
+            avgConnectionPaths: {$avg: {$subtract: ["$endedAt", "$createdAt"]}}
+          }
+        },
+        {$sort: {avgConnectionPaths: -1}}
+      ]);
+    } else {
+      return DaydStatsPath.aggregate([
+        {$match: {path: {$in: customPaths}, userId: {$nin: hide}}},
         {
           $group: {
             _id: "$path",
@@ -213,22 +235,12 @@ Meteor.methods({
         {$sort: {avgConnectionPaths: -1}}
       ]);
     }
-    return DaydStatsPath.aggregate([
-      {$match: {path: {$in: customPaths}}},
-      {
-        $group: {
-          _id: "$path",
-          avgConnectionPaths: {$avg: {$subtract: ["$endedAt", "$createdAt"]}}
-        }
-      },
-      {$sort: {avgConnectionPaths: -1}}
-    ]);
   },
 
-  getCustomStatsWithParameter: function(customName, userIds, all) {
-    if(customName && userIds && all) {
+  getCustomStatsWithParameter: function(customName, userIds, all, hide) {
+    if(customName && userIds && all && hide) {
       return DaydStatsCustom.aggregate([
-        {$match: {customName: customName, userId: {$in: userIds}, customDataName: {'$exists': true}}},
+        {$match: {customName: customName, userId: {$in: userIds, $nin: hide}, customDataName: {'$exists': true}}},
         {
           $group: {
             _id: "$customDataName",
@@ -240,7 +252,7 @@ Meteor.methods({
       ]);
     } else {
       return DaydStatsCustom.aggregate([
-        {$match: {customName: customName, customDataName: {'$exists': true}}},
+        {$match: {customName: customName, customDataName: {'$exists': true}, userId: {$nin: hide}}},
         {
           $group: {
             _id: "$customDataName",
@@ -253,47 +265,51 @@ Meteor.methods({
     }
   },
 
-  getCustomStatsCountWithParameter: function(customName, userIds, all) {
-    if(customName && userIds && all) {
+  getCustomStatsCountWithParameter: function(customName, userIds, all, hide) {
+    if(customName && userIds && all && hide) {
       return DaydStatsCustom.find({
         customName: customName,
-        userId: {$in: userIds},
+        userId: {$in: userIds, $nin: hide},
         customDataName: {'$exists': true}
       }).count();
     } else {
-      return DaydStatsCustom.find({customName: customName, customDataName: {'$exists': true}}).count();
+      return DaydStatsCustom.find({
+        "customName": customName,
+        "customDataName": {'$exists': true},
+        'userId': {$nin: hide}
+      }).count();
     }
   },
 
-  getStatsUsersConnectedInRealTime: function() {
+  getStatsUsersConnectedInRealTime: function(hide) {
     return DaydStatsUsers.aggregate([
-      {$match: {"finishedAt": {'$exists': false}}},
+      {$match: {"finishedAt": {'$exists': false}, "userId": {"$nin": hide}}},
       {$group: {_id: "$userEmail", count: {$sum: 1}}},
       {$sort: {count: -1}}
     ]);
   },
 
   getStatsUsersLastConnection: function(userIds) {
-    if(userIds){
+    if(userIds) {
       return DaydStatsUsers.aggregate([
-        {$match: {userId : {$in: userIds}}},
+        {$match: {userId: {$in: userIds}}},
         {$sort: {createdAt: -1}},
-        {$group: {"_id": "$userId", date: {$first: "$createdAt" }}},
-        {$sort:{'date': -1}}
+        {$group: {"_id": "$userId", date: {$first: "$createdAt"}}},
+        {$sort: {'date': -1}}
       ]);
     } else {
       return DaydStatsUsers.aggregate([
         {$sort: {createdAt: -1}},
-        {$group: {"_id": "$userId", date: {$first: "$createdAt" }}}
+        {$group: {"_id": "$userId", date: {$first: "$createdAt"}}}
       ]);
     }
-   },
+  },
 
   getNumberStatsVisitsPerUser: function(userIds) {
     return DaydStatsUsers.aggregate([
       {$match: {'userId': {$in: userIds}}},
       {$group: {_id: "$userEmail", count: {$sum: 1}}},
-      {$sort:{'date': -1}}
+      {$sort: {'date': -1}}
     ]);
   }
 });
