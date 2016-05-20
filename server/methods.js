@@ -273,18 +273,27 @@ Meteor.methods({
     ]);
   },
 
-  /*getStatsUsersLastConnection: function(userIds) {
-   return DaydStatsUsers.aggregate([
-   {$match: {userId:{$in: userIds}}},
-   {$group: {_id: "$userEmail", count: {$sum: 1}}}
-   ]);
-
-   },*/
+  getStatsUsersLastConnection: function(userIds) {
+    if(userIds){
+      return DaydStatsUsers.aggregate([
+        {$match: {userId : {$in: userIds}}},
+        {$sort: {createdAt: -1}},
+        {$group: {"_id": "$userId", date: {$first: "$createdAt" }}},
+        {$sort:{'date': -1}}
+      ]);
+    } else {
+      return DaydStatsUsers.aggregate([
+        {$sort: {createdAt: -1}},
+        {$group: {"_id": "$userId", date: {$first: "$createdAt" }}}
+      ]);
+    }
+   },
 
   getNumberStatsVisitsPerUser: function(userIds) {
     return DaydStatsUsers.aggregate([
       {$match: {'userId': {$in: userIds}}},
-      {$group: {_id: "$userEmail", count: {$sum: 1}}}
+      {$group: {_id: "$userEmail", count: {$sum: 1}}},
+      {$sort:{'date': -1}}
     ]);
   }
 });
