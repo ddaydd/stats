@@ -201,7 +201,7 @@ Meteor.methods({
   },
 
   getDurationConnectionPaths: function(customPaths, userIds, all) {
-    if(customPaths && userIds && all){
+    if(customPaths && userIds && all) {
       return DaydStatsPath.aggregate([
         {$match: {path: {$in: customPaths}, userId: {$in: userIds}}},
         {
@@ -239,8 +239,16 @@ Meteor.methods({
     ]);
   },
 
-  getCustomStatsCountWithParameter: function(customName) {
-    return DaydStatsCustom.find({customName: customName, customDataName: {'$exists': true}}).count();
+  getCustomStatsCountWithParameter: function(customName, userIds, all) {
+    if(customName && userIds && all) {
+      return DaydStatsCustom.find({
+        customName: customName,
+        userId: {$in: userIds},
+        customDataName: {'$exists': true}
+      }).count();
+    } else {
+      return DaydStatsCustom.find({customName: customName, customDataName: {'$exists': true}}).count();
+    }
   },
 
   getStatsUsersConnectedInRealTime: function() {
