@@ -200,7 +200,19 @@ Meteor.methods({
 
   },
 
-  getDurationConnectionPaths: function(customPaths) {
+  getDurationConnectionPaths: function(customPaths, userIds, all) {
+    if(customPaths && userIds && all){
+      return DaydStatsPath.aggregate([
+        {$match: {path: {$in: customPaths}, userId: {$in: userIds}}},
+        {
+          $group: {
+            _id: "$path",
+            avgConnectionPaths: {$avg: {$subtract: ["$endedAt", "$createdAt"]}}
+          }
+        },
+        {$sort: {avgConnectionPaths: -1}}
+      ]);
+    }
     return DaydStatsPath.aggregate([
       {$match: {path: {$in: customPaths}}},
       {
