@@ -139,8 +139,10 @@ Meteor.methods({
   },
 
   statsUserUpdate: function(userId) {
+    if(!userId) return console.log('Calling statsUserUpdate with no parameter');
     var date = new Date();
     var docInDb = DaydStatsUsers.findOne({userId: userId}, {sort: {createdAt: -1}});
+    if(!docInDb) return console.log('Calling statsUserUpdate: user not found');
     return DaydStatsUsers.update({_id: docInDb._id}, {
       $set: {"finishedAt": date}
     });
