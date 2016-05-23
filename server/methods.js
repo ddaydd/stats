@@ -213,10 +213,34 @@ Meteor.methods({
 
   },
 
-  getDurationConnectionPaths: function(customPaths, userIds, all, hide) {
-    if(customPaths && userIds && all && hide) {
+  getDurationConnectionPaths: function(customPaths, userIds, all, hide, date) {
+    var start = new Date(date.start);
+    var end = new Date(date.end);
+    if(customPaths && userIds && all && hide && !Object.keys(date).length) {
       return DaydStatsPath.aggregate([
         {$match: {path: {$in: customPaths}, userId: {$in: userIds, $nin: hide}}},
+        {
+          $group: {
+            _id: "$path",
+            avgConnectionPaths: {$avg: {$subtract: ["$endedAt", "$createdAt"]}}
+          }
+        },
+        {$sort: {avgConnectionPaths: -1}}
+      ]);
+    } else if(customPaths && userIds && all && hide && Object.keys(date).length){
+      return DaydStatsPath.aggregate([
+        {$match: {path: {$in: customPaths}, userId: {$in: userIds, $nin: hide}, createdAt: {$gte: start, $lt: end }}},
+        {
+          $group: {
+            _id: "$path",
+            avgConnectionPaths: {$avg: {$subtract: ["$endedAt", "$createdAt"]}}
+          }
+        },
+        {$sort: {avgConnectionPaths: -1}}
+      ]);
+    } else if(customPaths && !all && hide && Object.keys(date).length){
+      return DaydStatsPath.aggregate([
+        {$match: {path: {$in: customPaths}, userId: { $nin: hide}, createdAt: {$gte: start, $lt: end }}},
         {
           $group: {
             _id: "$path",
