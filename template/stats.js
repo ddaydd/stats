@@ -165,7 +165,7 @@ Template.daydStatsPath.helpers({
       return u.length;
   },
   lastDateConnection: function() {
-    Meteor.call('getStatsUsersLastConnection', this.userSelected, function(err, res) {
+    Meteor.call('getStatsUsersLastConnection', this.userSelected, this.date, function(err, res) {
       if(err) console.log(err);
       return Session.set('stats_user_last_connection', res);
     });
