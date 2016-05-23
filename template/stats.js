@@ -172,7 +172,7 @@ Template.daydStatsPath.helpers({
     return Session.get('stats_user_last_connection');
   },
   numberVisitsPerUser: function() {
-    Meteor.call('getNumberStatsVisitsPerUser', this.userSelected, function(err, res) {
+    Meteor.call('getNumberStatsVisitsPerUser', this.userSelected, this.date, function(err, res) {
       if(err) console.log(err);
       return Session.set('stats_visits_number_per_user', res);
     });
