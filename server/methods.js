@@ -380,12 +380,20 @@ Meteor.methods({
     }
   },
 
-  getNumberStatsVisitsPerUser: function(userIds) {
-    return DaydStatsUsers.aggregate([
-      {$match: {'userId': {$in: userIds}}},
-      {$group: {_id: "$userEmail", count: {$sum: 1}}},
-      {$sort: {'date': -1}}
-    ]);
+  getNumberStatsVisitsPerUser: function(userIds, date) {
+    if(Object.keys(date).length) {
+      return DaydStatsUsers.aggregate([
+        {$match: {'userId': {$in: userIds}, createdAt: {$gte: new Date(date.start), $lte: new Date(date.end)}}},
+        {$group: {_id: "$userEmail", count: {$sum: 1}}},
+        {$sort: {'date': -1}}
+      ]);
+    } else {
+      return DaydStatsUsers.aggregate([
+        {$match: {'userId': {$in: userIds}}},
+        {$group: {_id: "$userEmail", count: {$sum: 1}}},
+        {$sort: {'date': -1}}
+      ]);
+    }
   }
 });
 
