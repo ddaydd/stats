@@ -99,7 +99,7 @@ Template.daydStatsPath.helpers({
     return Session.get('stats_number_of_users_distinct');
   },
   usersNumbersCount: function() {
-    Meteor.call('statsUsersCount', this.hide, function(err, result) {
+    Meteor.call('statsUsersCount', this.hide, this.date, function(err, result) {
       if(err)
         return console.log(err);
       Session.set('stats_users_count', result);
