@@ -146,7 +146,7 @@ Template.daydStatsPath.helpers({
   },
   customCountNumbers: function() {
     var c = this.customName;
-    Meteor.call('getCustomStatsCountWithParameter', c, this.userSelected, this.all, this.hide, function(err, result) {
+    Meteor.call('getCustomStatsCountWithParameter', c, this.userSelected, this.all, this.hide, this.date, function(err, result) {
       if(err) console.log(err);
       Session.set('stats_count_per_custom_name_' + c, result);
     });
