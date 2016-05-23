@@ -186,7 +186,8 @@ Meteor.methods({
         }, {$sort: {count: -1}}])
     }
   },
-  statsUsersCount: function(hide) {
+  statsUsersCount: function(hide, date) {
+    if(Object.keys(date).length) return DaydStatsUsers.find({userId: {$nin: hide}, createdAt: {$gte: new Date(date.start), $lte:  new Date(date.end)}}).count();
     return DaydStatsUsers.find({userId: {$nin: hide}}).count();
   }
   ,
