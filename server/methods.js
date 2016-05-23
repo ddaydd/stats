@@ -364,10 +364,17 @@ Meteor.methods({
     ]);
   },
 
-  getStatsUsersLastConnection: function(userIds) {
-    if(userIds) {
+  getStatsUsersLastConnection: function(userIds, date) {
+    if(userIds && !Object.keys(date).length) {
       return DaydStatsUsers.aggregate([
         {$match: {userId: {$in: userIds}}},
+        {$sort: {createdAt: -1}},
+        {$group: {"_id": "$userId", date: {$first: "$createdAt"}}},
+        {$sort: {'date': -1}}
+      ]);
+    } else if(userIds && Object.keys(date).length) {
+      return DaydStatsUsers.aggregate([
+        {$match: {userId: {$in: userIds}, createdAt: {$gte: new Date(date.start), $lte: new Date(date.end)}}},
         {$sort: {createdAt: -1}},
         {$group: {"_id": "$userId", date: {$first: "$createdAt"}}},
         {$sort: {'date': -1}}
