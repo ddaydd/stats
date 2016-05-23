@@ -86,12 +86,39 @@ Meteor.methods({
     return DaydStatsCustom.insert(customData);
   },
 
-  statsNotFilteredGroupedPathCount: function(custPaths, userIds, all, hide) {
-    if(custPaths && userIds && all && hide) {
+  statsNotFilteredGroupedPathCount: function(custPaths, userIds, all, hide, date) {
+
+    if(custPaths && userIds && all && hide && !Object.keys(date).length) {
       return DaydStatsPath.aggregate([{
         "$match": {
           "path": {"$in": custPaths},
           "userId": {"$in": userIds, $nin: hide}
+        }
+      }, {
+        $group: {
+          _id: "$path",
+          count: {$sum: 1}
+        }
+      }, {$sort: {count: -1}}, {$limit: 3}]);
+    } else if(custPaths && userIds && all && hide && Object.keys(date).length) {
+      return DaydStatsPath.aggregate([{
+        "$match": {
+          "path": {"$in": custPaths},
+          "userId": {"$in": userIds, $nin: hide},
+          "createdAt": {$gte: new Date(date.start), $lte: new Date(date.end)}
+        }
+      }, {
+        $group: {
+          _id: "$path",
+          count: {$sum: 1}
+        }
+      }, {$sort: {count: -1}}, {$limit: 3}]);
+    } else if(custPaths && !all && hide && Object.keys(date).length){
+      return DaydStatsPath.aggregate([{
+        "$match": {
+          "path": {"$in": custPaths},
+          "userId": { $nin: hide},
+          "createdAt": {$gte:  new Date(date.start), $lte:  new Date(date.end)}
         }
       }, {
         $group: {
@@ -107,7 +134,6 @@ Meteor.methods({
         }
       }, {$sort: {count: -1}}, {$limit: 3}]);
     }
-
   },
 
   statsUserInsert: function(username, userEmail) {
@@ -214,8 +240,6 @@ Meteor.methods({
   },
 
   getDurationConnectionPaths: function(customPaths, userIds, all, hide, date) {
-    var start = new Date(date.start);
-    var end = new Date(date.end);
     if(customPaths && userIds && all && hide && !Object.keys(date).length) {
       return DaydStatsPath.aggregate([
         {$match: {path: {$in: customPaths}, userId: {$in: userIds, $nin: hide}}},
@@ -227,9 +251,9 @@ Meteor.methods({
         },
         {$sort: {avgConnectionPaths: -1}}
       ]);
-    } else if(customPaths && userIds && all && hide && Object.keys(date).length){
+    } else if(customPaths && userIds && all && hide && Object.keys(date).length) {
       return DaydStatsPath.aggregate([
-        {$match: {path: {$in: customPaths}, userId: {$in: userIds, $nin: hide}, createdAt: {$gte: start, $lt: end }}},
+        {$match: {path: {$in: customPaths}, userId: {$in: userIds, $nin: hide}, createdAt: {$gte: new Date(date.start), $lte:  new Date(date.end)}}},
         {
           $group: {
             _id: "$path",
@@ -238,9 +262,9 @@ Meteor.methods({
         },
         {$sort: {avgConnectionPaths: -1}}
       ]);
-    } else if(customPaths && !all && hide && Object.keys(date).length){
+    } else if(customPaths && !all && hide && Object.keys(date).length) {
       return DaydStatsPath.aggregate([
-        {$match: {path: {$in: customPaths}, userId: { $nin: hide}, createdAt: {$gte: start, $lt: end }}},
+        {$match: {path: {$in: customPaths}, userId: {$nin: hide}, createdAt: {$gte: new Date(date.start), $lte: new Date(date.end)}}},
         {
           $group: {
             _id: "$path",
