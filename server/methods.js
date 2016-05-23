@@ -392,11 +392,25 @@ Meteor.methods({
     }
   },
 
-  getCustomStatsCountWithParameter: function(customName, userIds, all, hide) {
-    if(customName && userIds && all && hide) {
+  getCustomStatsCountWithParameter: function(customName, userIds, all, hide, date) {
+    if(customName && userIds && all && hide && !Object.keys(date).length) {
       return DaydStatsCustom.find({
         customName: customName,
         userId: {$in: userIds, $nin: hide},
+        customDataName: {'$exists': true}
+      }).count();
+    } else if(customName && userIds && all && hide && Object.keys(date).length){
+      return DaydStatsCustom.find({
+        customName: customName,
+        userId: {$in: userIds, $nin: hide},
+        createdAt: {$gte: new Date(date.start), $lte: new Date(date.end)},
+        customDataName: {'$exists': true}
+      }).count();
+    } else if(customName && !all && hide && Object.keys(date).length){
+      return DaydStatsCustom.find({
+        customName: customName,
+        userId: { $nin: hide},
+        createdAt: {$gte: new Date(date.start), $lte: new Date(date.end)},
         customDataName: {'$exists': true}
       }).count();
     } else {
