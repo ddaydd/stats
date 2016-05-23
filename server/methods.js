@@ -259,15 +259,43 @@ Meteor.methods({
     }
   },
 
-  getPathsPerUserConnection: function(userIds, all, hide) {
-    if(userIds && all && hide) {
-      return DaydStatsPath.aggregate([{$match: {userId: {$in: userIds, $nin: hide}, connection_id: {$ne: "root"}}},
+  getPathsPerUserConnection: function(userIds, all, hide, date) {
+    if(userIds && all && hide && !Object.keys(date).length) {
+      return DaydStatsPath.aggregate([
+        {$match: {userId: {$in: userIds, $nin: hide}, connection_id: {$ne: "root"}}},
+        {$group: {"_id": {"connex": "$connection_id", "userId": "$userId"}, "pagesViewed": {$sum: 1}}},
+        {$group: {"_id": "$_id.userId", "avgPagesViewed": {$avg: "$pagesViewed"}}},
+        {$sort: {avgPagesViewed: -1}}
+      ]);
+    } else if(userIds && all && hide && Object.keys(date).length) {
+      return DaydStatsPath.aggregate([
+        {
+          $match: {
+            userId: {$in: userIds, $nin: hide},
+            connection_id: {$ne: "root"},
+            createdAt: {$gte: new Date(date.start), $lte: new Date(date.end)}
+          }
+        },
+        {$group: {"_id": {"connex": "$connection_id", "userId": "$userId"}, "pagesViewed": {$sum: 1}}},
+        {$group: {"_id": "$_id.userId", "avgPagesViewed": {$avg: "$pagesViewed"}}},
+        {$sort: {avgPagesViewed: -1}}
+      ]);
+    } else if(!all && hide && Object.keys(date).length) {
+      return DaydStatsPath.aggregate([
+        {
+          $match: {
+            userId: {$nin: hide},
+            connection_id: {$ne: "root"},
+            createdAt: {$gte: new Date(date.start), $lte: new Date(date.end)}
+          }
+        },
         {$group: {"_id": {"connex": "$connection_id", "userId": "$userId"}, "pagesViewed": {$sum: 1}}},
         {$group: {"_id": "$_id.userId", "avgPagesViewed": {$avg: "$pagesViewed"}}},
         {$sort: {avgPagesViewed: -1}}
       ]);
     } else {
-      return DaydStatsPath.aggregate([{$match: {userId: {'$exists': true, $nin: hide}, connection_id: {$ne: "root"}}},
+      return DaydStatsPath.aggregate([
+        {$match: {userId: {'$exists': true, $nin: hide}, connection_id: {$ne: "root"}}},
         {$group: {"_id": {"connex": "$connection_id", "userId": "$userId"}, "pagesViewed": {$sum: 1}}},
         {$group: {"_id": "$_id.userId", "avgPagesViewed": {$avg: "$pagesViewed"}}},
         {$sort: {avgPagesViewed: -1}}
