@@ -108,7 +108,7 @@ Template.daydStatsPath.helpers({
   }
   ,
   usersWithConnectionDuration: function() {
-    Meteor.call('getStatsDurationConnectionAverage', this.userSelected, this.all, this.hide, function(err, result) {
+    Meteor.call('getStatsDurationConnectionAverage', this.userSelected, this.all, this.hide, this.date, function(err, result) {
       if(err)
         console.log(err);
       Session.set('stats_user_with_duration', result);
