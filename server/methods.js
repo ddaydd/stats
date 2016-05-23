@@ -364,10 +364,48 @@ Meteor.methods({
     }
   },
 
-  getCustomStatsWithParameter: function(customName, userIds, all, hide) {
-    if(customName && userIds && all && hide) {
+  getCustomStatsWithParameter: function(customName, userIds, all, hide, date) {
+    if(customName && userIds && all && hide && !Object.keys(date).length) {
       return DaydStatsCustom.aggregate([
         {$match: {customName: customName, userId: {$in: userIds, $nin: hide}, customDataName: {'$exists': true}}},
+        {
+          $group: {
+            _id: "$customDataName",
+            count: {$sum: 1}
+          }
+        },
+        {$sort: {count: -1}},
+        {$limit: 10}
+      ]);
+    } else if(customName && userIds && all && hide && Object.keys(date).length) {
+      return DaydStatsCustom.aggregate([
+        {
+          $match: {
+            customName: customName,
+            userId: {$in: userIds, $nin: hide},
+            createdAt: {$gte: new Date(date.start), $lte: new Date(date.end)},
+            customDataName: {'$exists': true}
+          }
+        },
+        {
+          $group: {
+            _id: "$customDataName",
+            count: {$sum: 1}
+          }
+        },
+        {$sort: {count: -1}},
+        {$limit: 10}
+      ]);
+    } else if(customName && !all && hide && Object.keys(date).length){
+      return DaydStatsCustom.aggregate([
+        {
+          $match: {
+            customName: customName,
+            userId: { $nin: hide},
+            createdAt: {$gte: new Date(date.start), $lte: new Date(date.end)},
+            customDataName: {'$exists': true}
+          }
+        },
         {
           $group: {
             _id: "$customDataName",
@@ -399,17 +437,17 @@ Meteor.methods({
         userId: {$in: userIds, $nin: hide},
         customDataName: {'$exists': true}
       }).count();
-    } else if(customName && userIds && all && hide && Object.keys(date).length){
+    } else if(customName && userIds && all && hide && Object.keys(date).length) {
       return DaydStatsCustom.find({
         customName: customName,
         userId: {$in: userIds, $nin: hide},
         createdAt: {$gte: new Date(date.start), $lte: new Date(date.end)},
         customDataName: {'$exists': true}
       }).count();
-    } else if(customName && !all && hide && Object.keys(date).length){
+    } else if(customName && !all && hide && Object.keys(date).length) {
       return DaydStatsCustom.find({
         customName: customName,
-        userId: { $nin: hide},
+        userId: {$nin: hide},
         createdAt: {$gte: new Date(date.start), $lte: new Date(date.end)},
         customDataName: {'$exists': true}
       }).count();
