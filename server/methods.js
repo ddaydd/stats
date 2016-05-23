@@ -204,19 +204,43 @@ Meteor.methods({
   }
   ,
 
-  getStatsDurationConnectionAverage: function(userIds, all, hide) {
+  getStatsDurationConnectionAverage: function(userIds, all, hide, date) {
     DaydStatsUsers.aggregate([{
       $project: {
         userEmail: 1,
         userId: 1,
+        createdAt: 1,
         connectionDuration: {$subtract: ["$finishedAt", "$startedAt"]}
       }
     },
       {$out: "dayd_stats_output"}
     ]);
-    if(userIds && all && hide) {
+    if(userIds && all && hide && !Object.keys(date).length) {
       return DaydStatsOutput.aggregate([
         {$match: {userId: {$in: userIds, $nin: hide}}},
+        {
+          $group: {
+            _id: "$userEmail",
+            avgConnectionDuration: {$avg: "$connectionDuration"}
+          }
+        }, {$sort: {avgConnectionDuration: -1}}]);
+    } else if(userIds && all && hide && Object.keys(date).length) {
+      return DaydStatsOutput.aggregate([
+        {
+          $match: {
+            userId: {$in: userIds, $nin: hide},
+            createdAt: {$gte: new Date(date.start), $lte: new Date(date.end)}
+          }
+        },
+        {
+          $group: {
+            _id: "$userEmail",
+            avgConnectionDuration: {$avg: "$connectionDuration"}
+          }
+        }, {$sort: {avgConnectionDuration: -1}}]);
+    } else if(!all && hide && Object.keys(date).length) {
+      return DaydStatsOutput.aggregate([
+        {$match: {userId: {$nin: hide}, createdAt: {$gte: new Date(date.start), $lte: new Date(date.end)}}},
         {
           $group: {
             _id: "$userEmail",
