@@ -20,6 +20,7 @@ Package.onUse(function(api) {
     'accounts-base',
     'twbs:bootstrap'
   ]);
+  api.use(["tap:i18n"], ["client", "server"]);
 
   api.use("templating", "client");
   api.add_files('lib/collection.js', ['server', 'client']);
@@ -36,6 +37,13 @@ Package.onUse(function(api) {
   api.add_files("template/statsPages.html", "client");
   api.add_files('template/statsPages.js', ['client']);
   api.add_files('template/stats.css', ['client']);
+  
+
+  var languages = ["en", "fr"];
+  var languagesPaths = languages.map(function(language) {
+    return "lib/i18n/" + language + ".i18n.json";
+  });
+  api.addFiles(languagesPaths, ["client", "server"]);
 
   api.export(['DaydStatsPath', 'DaydStatsUsers', 'statsUserUpdate', 'statsUserInsert'], ['client', 'server']);
 });

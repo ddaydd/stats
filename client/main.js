@@ -11,4 +11,5 @@ Template.registerHelper('getUserById', function(userId) {
   var u = Meteor.users.findOne({_id: userId});
   if(u && u.emails && u.emails[0].address)
     return u.emails[0].address;
+  return TAPi18n.__("daydStatsUserNotFound");
 });
