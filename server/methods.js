@@ -44,7 +44,7 @@ Meteor.methods({
         stats.userId = this.userId;
 
       var lastInsert = DaydStats.insert(stats);
-      var lastPathDoc = DaydStatsPath.findOne({source_id: exist._id}, {sort: {createdAt: -1}});
+      if(exist) var lastPathDoc = DaydStatsPath.findOne({source_id: exist._id}, {sort: {createdAt: -1}});
       if(lastPathDoc)
         DaydStatsPath.update({_id: lastPathDoc._id}, {$set: {endedAt: date}});
       DaydStatsPath.insert({
