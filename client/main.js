@@ -2,7 +2,25 @@
  * Created by judyrandry on 5/12/16.
  */
 Accounts.onLogin(function() {
-  Meteor.call("statsUserInsert", Meteor.user().username, Meteor.user().emails[0].address, function(err, res) {
+
+  var u = Meteor.user();
+  var username, email;
+
+  if(u.username)
+    username = u.username;
+  else if(u.profile && u.profile.name)
+    username = u.profile.name;
+  else
+    username = 'unknown';
+
+  if(u.emails && u.emails.length && u.emails[0].address)
+    email = u.emails[0].address;
+  else if(u.services && u.services.google && u.services.google.email)
+    email = u.services.google.email;
+  else
+    username = 'unknown';
+
+  Meteor.call("statsUserInsert", username, email, function(err, res) {
     if(err)console.log(err);
     return res;
   });
