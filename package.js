@@ -18,9 +18,9 @@ Package.onUse(function(api) {
     'meteorhacks:aggregate@1.3.0',
     'gadicohen:headers@0.0.30',
     'accounts-base',
-    'twbs:bootstrap'
+    'twbs:bootstrap@3.3.6'
   ]);
-  api.use(["tap:i18n"], ["client", "server"]);
+  api.use(["tap:i18n@1.8.2"], ["client", "server"]);
 
   api.use("templating", "client");
   api.add_files('lib/collection.js', ['server', 'client']);
