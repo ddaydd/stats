@@ -17,8 +17,7 @@ Package.onUse(function(api) {
     'mongo',
     'meteorhacks:aggregate@1.3.0',
     'gadicohen:headers@0.0.30',
-    'accounts-base',
-    'twbs:bootstrap@3.3.6'
+    'accounts-base'
   ]);
   api.use(["tap:i18n@1.8.2"], ["client", "server"]);
 
