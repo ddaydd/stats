@@ -15,14 +15,13 @@ Accounts.onLogin(function() {
   else if(u.services && u.services.google && u.services.google.email) email = u.services.google.email;
   else email = 'unknown';
 
-  orbiter.core.log(username + " (" + email + ")", ["login"]);
-
   Meteor.call("statsUserInsert", username, email, function(err, res) {
     if(err) console.log(err);
     return res;
   });
 
 });
+
 Template.registerHelper('getUserById', function(userId) {
   const u = Meteor.users.findOne({_id: userId});
   if(u && u.emails && u.emails[0].address)
