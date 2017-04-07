@@ -17,7 +17,6 @@ Accounts.onLogin(function() {
 
   Meteor.call("statsUserInsert", username, email, function(err, res) {
     if(err) console.log(err);
-    return res;
   });
 
 });

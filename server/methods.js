@@ -1,21 +1,20 @@
 Meteor.methods({
 
   statsInsert: function(path, hasSession) {
-    var ip = this.connection.httpHeaders['x-forwarded-for'] || this.connection.clientAddress;
-    var exist = DaydStats.findOne({ip: ip});
-    var date = new Date();
-    var currentStatsUsers = DaydStatsUsers.findOne({userId: this.userId}, {sort: {createdAt: -1}});
-    if(currentStatsUsers && currentStatsUsers._id) {
-      connectionId = currentStatsUsers._id;
-    } else {
-      connectionId = "root";
-    }
+    const ip = this.connection.httpHeaders['x-forwarded-for'] || this.connection.clientAddress;
+    const exist = DaydStats.findOne({ip: ip});
+    const date = new Date();
+    const currentStatsUser = DaydStatsUsers.findOne({userId: this.userId}, {sort: {createdAt: -1}});
+    let connectionId = "root";
+    if(currentStatsUser && currentStatsUser._id) connectionId = currentStatsUser._id;
 
+    let lastPathDoc;
 
-    if(exist && currentStatsUsers) {
-      var userId = null;
+    // If the user has already been seen
+    if(exist && currentStatsUser) {
+      let userId = null;
       if(this.userId) userId = this.userId;
-      var lastPathDoc = DaydStatsPath.findOne({source_id: exist._id}, {sort: {createdAt: -1}});
+      lastPathDoc = DaydStatsPath.findOne({source_id: exist._id}, {sort: {createdAt: -1}});
       if(lastPathDoc)
         DaydStatsPath.update({_id: lastPathDoc._id}, {$set: {endedAt: date}});
       DaydStatsPath.insert({
@@ -30,8 +29,9 @@ Meteor.methods({
       });
       return exist._id;
     }
+    // If the user is new
     else {
-      var stats = {
+      let stats = {
         ip: ip,
         connectionId: this.connection.id,
         connection: this.connection,
@@ -40,11 +40,10 @@ Meteor.methods({
         createdAt: date
       };
 
-      if(this.userId)
-        stats.userId = this.userId;
+      if(this.userId) stats.userId = this.userId;
 
-      var lastInsert = DaydStats.insert(stats);
-      if(exist) var lastPathDoc = DaydStatsPath.findOne({source_id: exist._id}, {sort: {createdAt: -1}});
+      const lastInsert = DaydStats.insert(stats);
+      if(exist) lastPathDoc = DaydStatsPath.findOne({source_id: exist._id}, {sort: {createdAt: -1}});
       if(lastPathDoc)
         DaydStatsPath.update({_id: lastPathDoc._id}, {$set: {endedAt: date}});
       DaydStatsPath.insert({
@@ -57,7 +56,6 @@ Meteor.methods({
       if(this.connection && this.connection.headers) DaydStatsReferer.update({referer: this.connection.headers.referer}, {$inc: {count: +1}}, {upsert: true});
       return lastInsert;
     }
-
   },
 
   statsRemove: function(id) {
@@ -71,6 +69,22 @@ Meteor.methods({
     });
 
   },
+
+  getAllPath: function(){
+    return DaydStatsPath.aggregate([
+      {$group: {"_id": {"path": {$sum: 1}}}}
+    ]);
+  },
+
+  //
+  // getAllPath: function(){
+  //   return DaydStatsPath.aggregate([
+  //     {$match: {userId: {'$ne': null, '$exists': true, $nin: hide}, connection_id: {'$exists': true, $ne: "root"}}},
+  //     {$group: {"_id": {"connex": "$connection_id", "userId": "$userId"}, "pagesViewed": {$sum: 1}}},
+  //     {$group: {"_id": "$_id.userId", "avgPagesViewed": {$avg: "$pagesViewed"}}},
+  //     {$sort: {avgPagesViewed: -1}}
+  //   ]);
+  // },
 
   statsCustomInsert: function(customName, customId, customDataName) {
     if(!this.userId || !customName || !customId) return;
@@ -137,9 +151,11 @@ Meteor.methods({
   },
 
   statsUserInsert: function(username, userEmail) {
-    var ip = this.connection.httpHeaders['x-forwarded-for'] || this.connection.clientAddress;
-    var date = new Date();
-    var stats = {
+    if(!this.userId) return;
+
+    const ip = this.connection.httpHeaders['x-forwarded-for'] || this.connection.clientAddress;
+    const date = new Date();
+    let stats = {
       ip: ip,
       connectionId: this.connection.id,
       connection: this.connection,
@@ -147,27 +163,19 @@ Meteor.methods({
       startedAt: date,
       createdAt: date
     };
-    if(this.userId)
-      stats.userId = this.userId;
-    if(username)
-      stats.username = username;
-    if(userEmail)
-      stats.userEmail = userEmail;
-    //return DaydStatsUsers.insert(stats);
-    var isInDb = DaydStatsUsers.findOne({username: username}, {sort: {createdAt: -1}});
-    if(!isInDb) {
-      return DaydStatsUsers.insert(stats);
-    } else if(isInDb && !isInDb.finishedAt) {
-      return true;
-    } else if(isInDb && isInDb.finishedAt) {
-      return DaydStatsUsers.insert(stats);
-    }
+
+    if(username) stats.username = username;
+    if(userEmail) stats.userEmail = userEmail;
+
+    const isInDb = DaydStatsUsers.findOne({userId: this.userId});
+    if(!isInDb) return DaydStatsUsers.insert(stats);
+    else if(isInDb && isInDb.finishedAt) return DaydStatsUsers.insert(stats);
   },
 
   statsUserUpdate: function(userId) {
     if(!userId) return console.log('Calling statsUserUpdate with no parameter');
-    var date = new Date();
-    var docInDb = DaydStatsUsers.findOne({userId: userId}, {sort: {createdAt: -1}});
+    const date = new Date();
+    const docInDb = DaydStatsUsers.findOne({userId: userId}, {sort: {createdAt: -1}});
     if(!docInDb) return console.log('Calling statsUserUpdate: user not found');
     return DaydStatsUsers.update({_id: docInDb._id}, {
       $set: {"finishedAt": date}
@@ -271,7 +279,7 @@ Meteor.methods({
       return DaydStatsPath.aggregate([
         {
           $match: {
-            userId: {'$exists': true,'$ne': null, $in: userIds, $nin: hide},
+            userId: {'$exists': true, '$ne': null, $in: userIds, $nin: hide},
             connection_id: {'$exists': true, $ne: "root"},
             createdAt: {$gte: new Date(date.start), $lte: new Date(date.end)}
           }
@@ -396,12 +404,12 @@ Meteor.methods({
         {$sort: {count: -1}},
         {$limit: 10}
       ]);
-    } else if(customName && !all && hide && Object.keys(date).length){
+    } else if(customName && !all && hide && Object.keys(date).length) {
       return DaydStatsCustom.aggregate([
         {
           $match: {
             customName: customName,
-            userId: { $nin: hide},
+            userId: {$nin: hide},
             createdAt: {$gte: new Date(date.start), $lte: new Date(date.end)},
             customDataName: {'$exists': true}
           }
