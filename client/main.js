@@ -16,7 +16,7 @@ Accounts.onLogin(function() {
   else email = 'unknown';
 
   Meteor.call("statsUserInsert", username, email, function(err, res) {
-    if(err) console.log(err);
+    if(err) console.error(err);
   });
 
 });

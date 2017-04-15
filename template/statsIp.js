@@ -46,8 +46,7 @@ Template.daydStatsIp.events({
     Meteor.call('statsRemove', this._id, function(err, res) {
       if(!err)
         Router.go('daydStats');
-      else
-        console.log(err)
+      else console.error(err)
     });
   },
 
