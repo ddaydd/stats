@@ -84,24 +84,21 @@ Template.daydStats.events({
 Template.daydStatsPath.helpers({
   statsByPath: function() {
     Meteor.call("statsNotFilteredGroupedPathCount", this.customPath, this.userSelected, this.all, this.hide, this.date, function(err, result) {
-      if(err)
-        return console.error(err);
+      if(err) return console.error(err);
       Session.set('stats_list_by_path', result);
     });
     return Session.get('stats_list_by_path');
   },
   statsNumberOfUsersDistinct: function() {
     Meteor.call("statsUsersDistinct", this.distinct, this.hide, this.date, function(err, result) {
-      if(err)
-        return console.error(err);
+      if(err) return console.error(err);
       Session.set('stats_number_of_users_distinct', result);
     });
     return Session.get('stats_number_of_users_distinct');
   },
   usersNumbersCount: function() {
     Meteor.call('statsUsersCount', this.hide, this.date, function(err, result) {
-      if(err)
-        return console.error(err);
+      if(err) return console.error(err);
       Session.set('stats_users_count', result);
     });
     return Session.get('stats_users_count');
@@ -109,8 +106,7 @@ Template.daydStatsPath.helpers({
   ,
   usersWithConnectionDuration: function() {
     Meteor.call('getStatsDurationConnectionAverage', this.userSelected, this.all, this.hide, this.date, function(err, result) {
-      if(err)
-        console.error(err);
+      if(err) console.error(err);
       Session.set('stats_user_with_duration', result);
     });
     return Session.get('stats_user_with_duration');
@@ -120,15 +116,14 @@ Template.daydStatsPath.helpers({
   },
   pathPerConnection: function() {
     Meteor.call('getPathsPerUserConnection', this.userSelected, this.all, this.hide, this.date, function(err, result) {
-      if(err)
-        console.error(err);
+      if(err) console.error(err);
       Session.set('stats_pages_per_connection', result);
     });
     return Session.get('stats_pages_per_connection');
   },
   durationEnterPaths: function() {
     Meteor.call('getDurationConnectionPaths', this.customPaths, this.userSelected, this.all, this.hide, this.date, function(err, result) {
-      if(err)console.error(err);
+      if(err) console.error(err);
       Session.set('stats_duration_enter_paths', result);
     });
     return Session.get('stats_duration_enter_paths');
@@ -139,7 +134,7 @@ Template.daydStatsPath.helpers({
   customStatsList: function() {
     const c = this.customName;
     Meteor.call('getCustomStatsWithParameter', c, this.userSelected, this.all, this.hide, this.date, function(err, resust) {
-      if(err)console.error(err);
+      if(err) console.error(err);
       Session.set('stats_custom_listing_' + c, resust);
     });
     return Session.get('stats_custom_listing_' + c);
@@ -154,15 +149,15 @@ Template.daydStatsPath.helpers({
   },
   usersConnectedInRealTime: function() {
     Meteor.call('getStatsUsersConnectedInRealTime', this.hide, function(err, res) {
-      if(err)console.error(err);
+      if(err) console.error(err);
       Session.set('stats_users_connected_in_real_time', res);
     });
     return Session.get('stats_users_connected_in_real_time');
   },
   numberOfUsersConnected: function() {
     const u = Session.get('stats_users_connected_in_real_time');
-    if(u)
-      return u.length;
+    if(u) return u.length;
+    return 0;
   },
   lastDateConnection: function() {
     Meteor.call('getStatsUsersLastConnection', this.userSelected, this.date, function(err, res) {
@@ -190,7 +185,8 @@ function formatDuration(ms) {
   const duration = moment.duration(ms);
   if(duration.asHours() > 1) {
     return Math.floor(duration.asHours()) + moment.utc(duration.asMilliseconds()).format(":mm:ss");
-  } else {
+  }
+  else {
     return moment.utc(duration.asMilliseconds()).format("mm:ss");
   }
 }
